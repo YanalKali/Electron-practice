@@ -55,7 +55,7 @@ public class EloUtil {
 		int totalElo = 0;
 		int kitCount = 0;
 
-		for (Kit kit : Practice.get().getKitManager().getKits().values()) {
+		for (Kit kit : Practice.getInstance().getKitManager().getKits().values()) {
 			if (kit.isRanked()) {
 				totalElo += profile.getElo(kit);
 				kitCount++;
@@ -66,7 +66,7 @@ public class EloUtil {
 	}
 
 	public static void setElo(Profile profile, int amount) {
-		for (Kit kit : Practice.get().getKitManager().getKits().values()) {
+		for (Kit kit : Practice.getInstance().getKitManager().getKits().values()) {
 			if (kit.isRanked()) {
 				profile.setElo(kit, amount);
 			}
@@ -74,7 +74,7 @@ public class EloUtil {
 	}
 
 	public static void addElo(Profile profile, int amount) {
-		for (Kit kit : Practice.get().getKitManager().getKits().values()) {
+		for (Kit kit : Practice.getInstance().getKitManager().getKits().values()) {
 			if (kit.isRanked()) {
 				int newElo = profile.getElo(kit) + amount;
 				profile.setElo(kit, newElo);

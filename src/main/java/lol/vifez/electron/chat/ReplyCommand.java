@@ -20,7 +20,7 @@ public class ReplyCommand extends BaseCommand {
 
     @Default
     public void onReplyCommand(Player sender, String message) {
-        Profile senderProfile = Practice.get().getProfileManager().getProfile(sender.getUniqueId());
+        Profile senderProfile = Practice.getInstance().getProfileManager().getProfile(sender.getUniqueId());
         Player recipient = senderProfile.getLastMessagedPlayer();
 
         if (recipient == null) {

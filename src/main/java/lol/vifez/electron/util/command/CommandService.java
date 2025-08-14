@@ -133,7 +133,7 @@ public class CommandService {
                         );
                         flags.addAll(Arrays.asList(flag.names()));
                     } else {
-                        Practice.get().getLogger().warning("Failed to register command " + command.names()[0] +
+                        Practice.getInstance().getLogger().warning("Failed to register command " + command.names()[0] +
                                 ". Every parameter (except the CommandSender) must either have the @Flag or @Param " +
                                 "annotation (" +
                                 method.getDeclaringClass().getName() + ":" + method.getName() + ")");
@@ -247,9 +247,9 @@ public class CommandService {
             setFieldValue(pluginCommand, "usageMessage", "");
             setFieldValue(pluginCommand, "description", node.getDescription());
             if (COMMAND_MAP.register(plugin.getName(), pluginCommand))
-                Practice.get().getLogger().info("Registered command " + node.getFullLabel());
+                Practice.getInstance().getLogger().info("Registered command " + node.getFullLabel());
         } else {
-            Practice.get().getLogger().warning("Failed to register command " + node.getFullLabel());
+            Practice.getInstance().getLogger().warning("Failed to register command " + node.getFullLabel());
         }
     }
 

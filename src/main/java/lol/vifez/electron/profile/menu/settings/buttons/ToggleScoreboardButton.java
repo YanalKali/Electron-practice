@@ -27,7 +27,7 @@ public class ToggleScoreboardButton {
 
         return new EasyButton(scoreboardItem, true, false, () -> {
             profile.setScoreboardEnabled(!scoreboardEnabled);
-            Practice.get().getProfileManager().save(profile);
+            Practice.getInstance().getProfileManager().save(profile);
             new SettingsMenu(instance, profile).openMenu(profile.getPlayer());
         });
     }

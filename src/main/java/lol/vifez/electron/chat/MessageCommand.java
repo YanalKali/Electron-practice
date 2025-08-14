@@ -28,7 +28,7 @@ public class MessageCommand extends BaseCommand {
             return;
         }
 
-        Profile senderProfile = Practice.get().getProfileManager().getProfile(sender.getUniqueId());
+        Profile senderProfile = Practice.getInstance().getProfileManager().getProfile(sender.getUniqueId());
 
         if (!senderProfile.isPrivateMessagingEnabled()) {
             sender.sendMessage(CC.translate("&cPrivate messaging is disabled."));

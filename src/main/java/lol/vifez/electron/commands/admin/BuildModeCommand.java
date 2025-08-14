@@ -18,7 +18,7 @@ public class BuildModeCommand extends BaseCommand {
     @CommandAlias("buildmode|build|bm")
     @CommandPermission("electron.admin")
     public void buildMode(Player player) {
-        Profile profile = Practice.get().getProfileManager().getProfile(player.getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
         profile.setBuildMode(!profile.isBuildMode());
 
         CC.sendMessage(player, profile.isBuildMode() ? "&aYou are now in build mode!" : "&cYou are no longer in build mode!");

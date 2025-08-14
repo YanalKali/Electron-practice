@@ -39,7 +39,7 @@ public class WorldTimeButton {
             }
 
             profile.setWorldTime(newTime);
-            Practice.get().getProfileManager().save(profile);
+            Practice.getInstance().getProfileManager().save(profile);
 
             Player player = profile.getPlayer();
             if (player != null) {

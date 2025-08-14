@@ -63,15 +63,19 @@ public final class Practice extends JavaPlugin {
     @Getter private MatchManager matchManager;
     @Getter private QueueManager queueManager;
     @Getter private Leaderboard leaderboards;
+    @Getter private static Practice instance;
 
     @Override
     public void onLoad() {
+        instance = this;
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().init();
     }
 
     @Override
     public void onEnable() {
+        instance = this;
+
         saveDefaultConfig();
         languageConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "language.yml"));
 
@@ -195,9 +199,5 @@ public final class Practice extends JavaPlugin {
         if (kitManager != null) kitManager.close();
 
         PacketEvents.getAPI().terminate();
-    }
-
-    public static Practice get() {
-        return getPlugin(Practice.class);
     }
 }

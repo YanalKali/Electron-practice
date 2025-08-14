@@ -85,7 +85,7 @@ public class Profile {
     }
 
     private void saveToMongoDB() {
-        ProfileManager profileManager = Practice.get().getProfileManager();
+        ProfileManager profileManager = Practice.getInstance().getProfileManager();
         profileManager.getProfileRepository().getCollection()
                 .updateOne(Filters.eq("_id", uuid.toString()),
                         new org.bson.Document("$set", new org.bson.Document("scoreboardEnabled", scoreboardEnabled)));
@@ -117,15 +117,15 @@ public class Profile {
     }
 
     public boolean inMatch() {
-        return Practice.get().getMatchManager().getMatch(uuid) != null;
+        return Practice.getInstance().getMatchManager().getMatch(uuid) != null;
     }
 
     public Match getMatch() {
-        return Practice.get().getMatchManager().getMatch(uuid);
+        return Practice.getInstance().getMatchManager().getMatch(uuid);
     }
 
     public Queue getQueue() {
-        return Practice.get().getQueueManager().getQueue(uuid);
+        return Practice.getInstance().getQueueManager().getQueue(uuid);
     }
 
     public void checkDivision(Kit kit) {

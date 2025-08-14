@@ -80,7 +80,7 @@ public class Queue {
                     return;
                 }
 
-                Bukkit.getScheduler().runTask(Practice.get(), () -> new Match(instance, oneProfile, twoProfile, kit, arena, true));
+                Bukkit.getScheduler().runTask(Practice.getInstance(), () -> new Match(instance, oneProfile, twoProfile, kit, arena, true));
             } else {
                 if (rankedIndex > playersInQueue.size()) return;
 

@@ -29,8 +29,8 @@ public class EloCommand extends BaseCommand {
 
     @Subcommand("set")
     public void set(CommandSender sender, @Name("player")Player player, @Name("kit") String kitName, @Name("elo")int elo) {
-        Profile profile = Practice.get().getProfileManager().getProfile(player.getUniqueId());
-        Kit kit = Practice.get().getKitManager().getKit(kitName.toLowerCase());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
+        Kit kit = Practice.getInstance().getKitManager().getKit(kitName.toLowerCase());
 
         if (kit == null) {
             CC.sendMessage(sender, "&cInvalid kit name.");
@@ -43,8 +43,8 @@ public class EloCommand extends BaseCommand {
 
     @Subcommand("add")
     public void add(CommandSender sender, @Name("player")Player player, @Name("kit") String kitName, @Name("elo")int elo) {
-        Profile profile = Practice.get().getProfileManager().getProfile(player.getUniqueId());
-        Kit kit = Practice.get().getKitManager().getKit(kitName.toLowerCase());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
+        Kit kit = Practice.getInstance().getKitManager().getKit(kitName.toLowerCase());
 
         if (kit == null) {
             CC.sendMessage(sender, "&cInvalid kit name.");
@@ -60,8 +60,8 @@ public class EloCommand extends BaseCommand {
 
     @Subcommand("remove")
     public void remove(CommandSender sender, @Name("player")Player player, @Name("kit") String kitName, @Name("elo")int elo) {
-        Profile profile = Practice.get().getProfileManager().getProfile(player.getUniqueId());
-        Kit kit = Practice.get().getKitManager().getKit(kitName.toLowerCase());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
+        Kit kit = Practice.getInstance().getKitManager().getKit(kitName.toLowerCase());
 
         if (kit == null) {
             CC.sendMessage(sender, "&cInvalid kit name.");

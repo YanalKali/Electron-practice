@@ -28,7 +28,7 @@ public class ToggleMessagesButton {
 
         return new EasyButton(messagesItem, true, false, () -> {
             profile.setPrivateMessagingEnabled(!profile.isPrivateMessagingEnabled());
-            Practice.get().getProfileManager().save(profile);
+            Practice.getInstance().getProfileManager().save(profile);
 
             Player player = profile.getPlayer();
             if (profile.isPrivateMessagingEnabled()) {
