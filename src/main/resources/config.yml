@@ -37,8 +37,8 @@ settings:
 
 scoreboard:
   enabled: true
+  title: "&b&lElectron"
   in-lobby:
-    title: "&b&lEssence"
     lines:
       - " "
       - "&b<username>"
@@ -50,7 +50,6 @@ scoreboard:
       - " "
       - "&7&oessence.gg"
   in-queue:
-    title: "&b&lEssence"
     lines:
       - " "
       - "&b<username>"
@@ -63,7 +62,6 @@ scoreboard:
       - " "
       - "&7&oessence.gg"
   in-game:
-    title: "&b&lEssence"
     lines:
       - " "
       - "&fFighting: &b<opponent>"
@@ -74,7 +72,6 @@ scoreboard:
       - " "
       - "&7&oessence.gg"
   in-boxing:
-    title: "&b&lEssence"
     lines:
       - "&7&m--------------------"
       - "&bfFighting: &f<opponent>"
@@ -89,16 +86,14 @@ scoreboard:
       - "&7&oelectron.gg"
       - "&7&m--------------------"
   match-starting:
-    title: "&bElectron &7┃ &fPractice"
     lines:
       - "&7&m--------------------"
       - "&fFighting: &b<opponent>"
-      - "&fStarting: &b<starting-c>" # starting-c = game start countdown
+      - "&fStarting: &b<starting-c>"
       - "&r "
       - "&7&oelectron.gg"
       - "&7&m--------------------"
   match-ending:
-    title: "&bElectron &7┃ &fPractice"
     lines:
       - "&7&m--------------------"
       - "&fMatch Ended"
