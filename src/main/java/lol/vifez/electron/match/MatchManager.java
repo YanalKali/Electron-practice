@@ -1,0 +1,148 @@
+package lol.vifez.electron.match;
+
+import lol.vifez.electron.Practice;
+import lol.vifez.electron.match.enums.MatchState;
+import lol.vifez.electron.match.event.MatchEndEvent;
+import lol.vifez.electron.match.event.MatchStartEvent;
+import lol.vifez.electron.profile.Profile;
+import lol.vifez.electron.util.CC;
+import lol.vifez.electron.hotbar.Hotbar;
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+/*
+ * Copyright (c) 2025 Vifez. All rights reserved.
+ * Unauthorized use or distribution is prohibited.
+ */
+
+@Getter
+public class MatchManager {
+
+    private final Practice instance;
+    private final Map<UUID, Match> matches;
+
+    public MatchManager(Practice practice) {
+        this.instance = practice;
+        this.matches = new ConcurrentHashMap<>();
+    }
+
+    public Match getMatch(UUID uuid) {
+        return matches.get(uuid);
+    }
+
+    public void remove(UUID uuid) {
+        matches.remove(uuid);
+    }
+
+    public void remove(Match match) {
+        match.getArena().setBusy(false);
+
+        matches.remove(match.getPlayerOne().getUuid());
+        matches.remove(match.getPlayerTwo().getUuid());
+    }
+
+    public int getAllMatchSize() {
+        return matches.size() * 2;
+    }
+
+    public void start(Match match) {
+        match.setMatchState(MatchState.STARTING);
+        match.getArena().setBusy(true);
+
+        Profile profileOne = match.getPlayerOne();
+        Profile profileTwo = match.getPlayerTwo();
+        Profile[] profiles = {profileOne, profileTwo};
+
+        int index = 0;
+        for (Profile profile : profiles) {
+            profile.getPlayer().teleport(index == 0 ? match.getArena().getSpawnA() : match.getArena().getSpawnB());
+            profile.getPlayer().getActivePotionEffects().clear();
+            match.denyMovement(profile.getPlayer());
+
+            ItemStack[] loadout;
+
+            if (profile.getKitLoadout().get(match.getKit().getName().toLowerCase()) == null) {
+                loadout = match.getKit().getContents();
+            } else {
+                loadout = profile.getKitLoadout().get(match.getKit().getName().toLowerCase());
+            }
+
+            profile.getPlayer().getInventory().setArmorContents(match.getKit().getArmorContents());
+            profile.getPlayer().getInventory().setContents(loadout);
+
+            instance.getServer().getScheduler().runTaskLater(instance, () -> {
+                CC.sendMessage(profile.getPlayer(), "&aMatch started!");
+
+                profile.getPlayer().playSound(profile.getPlayer().getLocation(), Sound.NOTE_PLING, 0.5f, 0.5f);
+                match.setMatchState(MatchState.STARTED);
+                match.allowMovement(profile.getPlayer());
+
+                Bukkit.getPluginManager().callEvent(new MatchStartEvent(profileOne, profileTwo, match));
+            }, 100L);
+
+            matches.put(profile.getUuid(), match);
+            index++;
+        }
+    }
+
+    public int getTotalPlayersInMatches() {
+        return matches.values().stream()
+                .mapToInt(match -> match.getMatchState() == MatchState.STARTED ? 2 : 0)
+                .sum();
+    }
+
+    public void end(Match match) {
+        match.setMatchState(MatchState.ENDING);
+
+        if (match.getWinner() == null) {
+            Profile profileOne = match.getPlayerOne();
+            Profile profileTwo = match.getPlayerTwo();
+            Profile[] profiles = {profileOne, profileTwo};
+
+            for (Profile profile : profiles) {
+                CC.sendMessage(profile.getPlayer(), "&cMatch has ended!");
+                profile.getPlayer().playSound(profile.getPlayer().getLocation(), Sound.NOTE_PLING, 0.5f, 0.5f);
+                Bukkit.getPluginManager().callEvent(new MatchEndEvent(profileOne, profileTwo, match));
+
+                instance.getServer().getScheduler().runTaskLater(instance, () -> {
+                    profile.getPlayer().getInventory().setArmorContents(null);
+                    profile.getPlayer().getInventory().setContents(Hotbar.getSpawnItems());
+
+                    profile.getPlayer().teleport(instance.getSpawnLocation());
+
+                    match.setMatchState(MatchState.ENDED);
+                    match.getArena().setBusy(false);
+
+                    remove(match);
+                }, 100L);
+            }
+        } else {
+            Profile winner = match.getWinner();
+            Profile loser = match.getOpponent(match.getWinner().getPlayer());
+            Profile[] profiles = {winner, loser};
+
+            for (Profile profile : profiles) {
+                profile.getPlayer().playSound(profile.getPlayer().getLocation(), Sound.NOTE_PLING, 0.5f, 0.5f);
+
+                instance.getServer().getScheduler().runTaskLater(instance, () -> {
+                    profile.getPlayer().getInventory().setArmorContents(null);
+                    profile.getPlayer().getInventory().setContents(Hotbar.getSpawnItems());
+
+                    profile.getPlayer().teleport(instance.getSpawnLocation());
+
+                    match.setMatchState(MatchState.ENDED);
+                    match.getArena().setBusy(false);
+
+                    match.allowMovement(profile.getPlayer());
+                    remove(match);
+                }, 100L);
+            }
+        }
+    }
+}

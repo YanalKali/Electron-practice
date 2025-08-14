@@ -1,0 +1,8 @@
+name: Practice
+version: '1.0'
+main: lol.vifez.electron.Practice
+soft-depend:
+  - PlaceholderAPI
+authors:
+  - 'vifez'
+  - 'MTR'

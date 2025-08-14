@@ -1,0 +1,109 @@
+# ███████╗██╗     ███████╗ ██████╗████████╗██████╗  ██████╗ ███╗   ██╗
+# ██╔════╝██║     ██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗████╗  ██║
+# █████╗  ██║     █████╗  ██║        ██║   ██████╔╝██║   ██║██╔██╗ ██║
+# ██╔══╝  ██║     ██╔══╝  ██║        ██║   ██╔══██╗██║   ██║██║╚██╗██║
+# ███████╗███████╗███████╗╚██████╗   ██║   ██║  ██║╚██████╔╝██║ ╚████║
+# ╚══════╝╚══════╝╚══════╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+#                       Practice • v1.0
+
+mongo:
+  host: "localhost"
+  port: 27017
+  database: "Electron"
+  # ↓ Leave blank if no auth!
+  user: ""
+  # ↓ Leave blank if no auth!
+  password: ""
+
+settings:
+  # ↓ Spawn Cords (/setspawn works)
+  spawn-location: "world, 0, 150, 0, 0, 0"
+  # ↓ Would you like a Join MOTD?
+  join-message:
+    enabled: true
+    messages:
+      - "&7&m--------------------------------------------------"
+      - "&b&lElectron Practice"
+      - " &fDuels, events, ranked"
+      - " &fMultiple game modes available"
+      - " "
+      - "&7» &f&lSeason &bI"
+      - " "
+      - "&b&lFeatures"
+      - "&7» &b&lNEW &fPractice core with better performance"
+      - "&7» &b&lNEW &fSpawn and builds"
+      - "&7&m--------------------------------------------------"
+      -
+
+scoreboard:
+  enabled: true
+  in-lobby:
+    title: "&b&lEssence"
+    lines:
+      - " "
+      - "&b<username>"
+      - " &fELO: &b1000"
+      - " &fDivision: &7Silver"
+      - " "
+      - " &fOnline: &b<online>"
+      - " &fFighting: &b<in-queue>"
+      - " "
+      - "&7&oessence.gg"
+  in-queue:
+    title: "&b&lEssence"
+    lines:
+      - " "
+      - "&b<username>"
+      - " &fELO: &b1000"
+      - " &fDivision: &7Silver"
+      - " "
+      - "&b&lQueue&7:"
+      - " &fKit: &b<kit>"
+      - " &fTime: &b<time>"
+      - " "
+      - "&7&oessence.gg"
+  in-game:
+    title: "&b&lEssence"
+    lines:
+      - " "
+      - "&fFighting: &b<opponent>"
+      - "&fDuration: &a<>"
+      - " "
+      - "&fYour ping: &a<ping>ms"
+      - "&fTheir ping: &c<opponent-ping>ms"
+      - " "
+      - "&7&oessence.gg"
+  in-boxing:
+    title: "&b&lEssence"
+    lines:
+      - "&7&m--------------------"
+      - "&bfFighting: &f<opponent>"
+      - " "
+      - "&fHits: &b<diffrence>"
+      - " &aYou: &a<your-hits>"
+      - " &cThem: &c<their-hits>"
+      - " "
+      - "&aYour Ping: <ping>&7ms"
+      - "&cTheir Ping: <opponent-ping>&7ms"
+      - "&r"
+      - "&7&oelectron.gg"
+      - "&7&m--------------------"
+  match-starting:
+    title: "&bElectron &7┃ &fPractice"
+    lines:
+      - "&7&m--------------------"
+      - "&fFighting: &b<opponent>"
+      - "&fStarting: &b<starting-c>" # starting-c = game start countdown
+      - "&r "
+      - "&7&oelectron.gg"
+      - "&7&m--------------------"
+  match-ending:
+    title: "&bElectron &7┃ &fPractice"
+    lines:
+      - "&7&m--------------------"
+      - "&fMatch Ended"
+      - "&fWinner&7: &a<winner>"
+      - "&fLoser&7: &c<loser>"
+      - " "
+      - "&7&oelectron.gg"
+      - "&7&m--------------------"
