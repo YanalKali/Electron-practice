@@ -67,7 +67,6 @@ public final class Practice extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        instance = this;
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().init();
     }
