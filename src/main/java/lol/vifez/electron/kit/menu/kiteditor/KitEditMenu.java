@@ -9,23 +9,19 @@ import lol.vifez.electron.hotbar.Hotbar;
 import lol.vifez.electron.util.menu.Menu;
 import lol.vifez.electron.util.menu.button.Button;
 import lol.vifez.electron.util.menu.button.impl.EasyButton;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/*
- * Copyright (c) 2025 Vifez. All rights reserved.
- * Unauthorized use or distribution is prohibited.
- */
-
-@RequiredArgsConstructor
 public class KitEditMenu extends Menu {
 
-    private final Practice instance;
     private final Kit kit;
+
+    public KitEditMenu(Kit kit) {
+        this.kit = kit;
+    }
 
     @Override
     public String getTitle(Player player) {
@@ -34,7 +30,8 @@ public class KitEditMenu extends Menu {
 
     @Override
     public void onOpen(Player player) {
-        Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+        Practice plugin = Practice.getInstance();
+        Profile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
         profile.setEditMode(true);
 
         CC.sendMessage(player, "&aYou are now editing " + kit.getColor() + kit.getName() + " &alayout!");
@@ -42,17 +39,16 @@ public class KitEditMenu extends Menu {
 
     @Override
     public Map<Integer, Button> getButtons(Player player) {
+        Practice plugin = Practice.getInstance();
         Map<Integer, Button> buttons = new HashMap<>();
-        Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+        Profile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
 
         buttons.put(11, new EasyButton(new ItemBuilder(Material.WOOL)
                 .name("&2&lSave & Exit")
                 .durability((short) 13)
-                .lore("&r",
-                        "&7Click here to save this layout and exit the menu")
+                .lore("&r", "&7Click here to save this layout and exit the menu")
                 .build(), true, false, () -> {
             profile.getKitLoadout().put(kit.getName().toLowerCase(), player.getInventory().getContents());
-
             player.closeInventory();
             profile.setEditMode(false);
             player.getInventory().setContents(Hotbar.getSpawnItems());
@@ -63,8 +59,7 @@ public class KitEditMenu extends Menu {
         buttons.put(13, new EasyButton(new ItemBuilder(Material.WOOL)
                 .name("&e&lReset")
                 .durability((short) 4)
-                .lore("&r",
-                        "&7Click here to reset this layout to the default!")
+                .lore("&r", "&7Click here to reset this layout to the default!")
                 .build(), true, false, () -> {
             player.getInventory().setContents(kit.getContents());
         }));
@@ -72,11 +67,9 @@ public class KitEditMenu extends Menu {
         buttons.put(15, new EasyButton(new ItemBuilder(Material.WOOL)
                 .name("&c&lCancel & Exit")
                 .durability((short) 14)
-                .lore("&r",
-                        "&7Click here to exit the menu and not save the changes!")
+                .lore("&r", "&7Click here to exit the menu and not save the changes!")
                 .build(), true, false, () -> {
             profile.setEditMode(false);
-
             CC.sendMessage(player, "&cCancelled layout changes!");
             player.closeInventory();
             player.getInventory().setContents(Hotbar.getSpawnItems());

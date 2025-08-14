@@ -18,11 +18,9 @@ import org.bukkit.entity.Player;
 @CommandPermission("electron.arena")
 public class ArenaCommand extends BaseCommand {
 
-    private final Practice plugin;
     private final ArenaManager arenaManager;
 
     public ArenaCommand(Practice plugin, ArenaManager arenaManager) {
-        this.plugin = plugin;
         this.arenaManager = arenaManager;
     }
 

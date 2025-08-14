@@ -20,14 +20,12 @@ import java.util.stream.Collectors;
 
 public class ArenaManager {
 
-    private final Practice instance;
-    private final Map<String, Arena> arenas;
+    private final Map<String, Arena> arenas = new ConcurrentHashMap<>();
 
-    public ArenaManager(Practice instance) {
-        this.instance = instance;
-        this.arenas = new ConcurrentHashMap<>();
-
-        ConfigurationSection section = instance.getArenasFile().getConfiguration().getConfigurationSection("arenas");
+    public ArenaManager() {
+        ConfigurationSection section = Practice.getInstance().getArenasFile()
+                .getConfiguration()
+                .getConfigurationSection("arenas");
 
         if (section != null) {
             section.getKeys(false).forEach(key -> {
@@ -68,22 +66,23 @@ public class ArenaManager {
     public void delete(Arena arena) {
         arenas.remove(arena.getName().toLowerCase());
 
-        instance.getArenasFile().getConfiguration().set("arenas." + arena.getName().toLowerCase(), null);
-        instance.getArenasFile().save();
+        Practice.getInstance().getArenasFile().getConfiguration()
+                .set("arenas." + arena.getName().toLowerCase(), null);
+        Practice.getInstance().getArenasFile().save();
     }
 
     public void close() {
         arenas.values().forEach(arena -> {
             String path = "arenas." + arena.getName().toLowerCase();
-            instance.getArenasFile().getConfiguration().set(path + ".type", arena.getType());
-            instance.getArenasFile().getConfiguration().set(path + ".spawnA", formatLocation(arena.getSpawnA()));
-            instance.getArenasFile().getConfiguration().set(path + ".spawnB", formatLocation(arena.getSpawnB()));
-            instance.getArenasFile().getConfiguration().set(path + ".icon", arena.getIcon().toString());
-            instance.getArenasFile().getConfiguration().set(path + ".positionOne", formatLocation(arena.getPositionOne()));
-            instance.getArenasFile().getConfiguration().set(path + ".positionTwo", formatLocation(arena.getPositionTwo()));
-            instance.getArenasFile().getConfiguration().set(path + ".kits", arena.getKits());
+            Practice.getInstance().getArenasFile().getConfiguration().set(path + ".type", arena.getType());
+            Practice.getInstance().getArenasFile().getConfiguration().set(path + ".spawnA", formatLocation(arena.getSpawnA()));
+            Practice.getInstance().getArenasFile().getConfiguration().set(path + ".spawnB", formatLocation(arena.getSpawnB()));
+            Practice.getInstance().getArenasFile().getConfiguration().set(path + ".icon", arena.getIcon().toString());
+            Practice.getInstance().getArenasFile().getConfiguration().set(path + ".positionOne", formatLocation(arena.getPositionOne()));
+            Practice.getInstance().getArenasFile().getConfiguration().set(path + ".positionTwo", formatLocation(arena.getPositionTwo()));
+            Practice.getInstance().getArenasFile().getConfiguration().set(path + ".kits", arena.getKits());
         });
-        instance.getArenasFile().save();
+        Practice.getInstance().getArenasFile().save();
     }
 
     private String formatLocation(Location location) {

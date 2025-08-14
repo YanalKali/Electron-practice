@@ -26,9 +26,9 @@ import lol.vifez.electron.mongo.MongoAPI;
 import lol.vifez.electron.mongo.MongoCredentials;
 import lol.vifez.electron.placeholderapi.ElectronPlaceholders;
 import lol.vifez.electron.profile.ProfileManager;
-import lol.vifez.electron.profile.command.ProfileCommand;
 import lol.vifez.electron.profile.repository.ProfileRepository;
 import lol.vifez.electron.queue.QueueManager;
+import lol.vifez.electron.queue.listener.QueueListener;
 import lol.vifez.electron.scoreboard.PracticeScoreboard;
 import lol.vifez.electron.tab.ElectronTab;
 import lol.vifez.electron.util.*;
@@ -90,8 +90,9 @@ public final class Practice extends JavaPlugin {
     }
 
     private void initListeners() {
-        new SpawnListener(this);
-        new MatchListener(this);
+        new SpawnListener();
+        new MatchListener();
+        new QueueListener();
         new MenuAPI(this);
     }
 
@@ -100,8 +101,7 @@ public final class Practice extends JavaPlugin {
         manager.registerCommand(new ArenaCommand(this, arenaManager));
         manager.registerCommand(new ArenasCommand(this));
         manager.registerCommand(new ElectronCommand(this));
-        manager.registerCommand(new KitCommands(this));
-        manager.registerCommand(new ProfileCommand(profileManager));
+        manager.registerCommand(new KitCommands());
         manager.registerCommand(new BuildModeCommand());
         manager.registerCommand(new KitEditorCommand(this));
         manager.registerCommand(new LeaderboardCommand());
@@ -168,10 +168,10 @@ public final class Practice extends JavaPlugin {
 
     private void initModels() {
         profileManager = new ProfileManager(new ProfileRepository(mongoAPI, gson));
-        arenaManager = new ArenaManager(this);
-        kitManager = new KitManager(this);
-        matchManager = new MatchManager(this);
-        queueManager = new QueueManager(this);
+        arenaManager = new ArenaManager();
+        kitManager = new KitManager();
+        matchManager = new MatchManager();
+        queueManager = new QueueManager();
         leaderboards = new Leaderboard(profileManager);
     }
 

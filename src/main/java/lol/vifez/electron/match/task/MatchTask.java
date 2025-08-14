@@ -1,6 +1,7 @@
 package lol.vifez.electron.match.task;
 
 import com.cryptomorin.xseries.messages.Titles;
+import lol.vifez.electron.Practice;
 import lol.vifez.electron.match.MatchManager;
 import lol.vifez.electron.match.enums.MatchState;
 import lol.vifez.electron.profile.Profile;
@@ -42,7 +43,7 @@ public class MatchTask extends BukkitRunnable {
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, 0.5f, 0.5f);
                 });
 
-                Bukkit.getScheduler().runTask(matchHandler.getInstance(), () -> {
+                Bukkit.getScheduler().runTask(Practice.getInstance(), () -> {
                     match.allowMovement(match.getPlayerTwo().getPlayer());
                     match.allowMovement(match.getPlayerOne().getPlayer());
                 });

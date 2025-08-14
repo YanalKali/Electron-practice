@@ -24,11 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class MatchManager {
 
-    private final Practice instance;
     private final Map<UUID, Match> matches;
 
-    public MatchManager(Practice practice) {
-        this.instance = practice;
+    public MatchManager() {
         this.matches = new ConcurrentHashMap<>();
     }
 
@@ -76,7 +74,7 @@ public class MatchManager {
             profile.getPlayer().getInventory().setArmorContents(match.getKit().getArmorContents());
             profile.getPlayer().getInventory().setContents(loadout);
 
-            instance.getServer().getScheduler().runTaskLater(instance, () -> {
+            Practice.getInstance().getServer().getScheduler().runTaskLater(Practice.getInstance(), () -> {
                 CC.sendMessage(profile.getPlayer(), "&aMatch started!");
 
                 profile.getPlayer().playSound(profile.getPlayer().getLocation(), Sound.NOTE_PLING, 0.5f, 0.5f);
@@ -110,11 +108,11 @@ public class MatchManager {
                 profile.getPlayer().playSound(profile.getPlayer().getLocation(), Sound.NOTE_PLING, 0.5f, 0.5f);
                 Bukkit.getPluginManager().callEvent(new MatchEndEvent(profileOne, profileTwo, match));
 
-                instance.getServer().getScheduler().runTaskLater(instance, () -> {
+                Practice.getInstance().getServer().getScheduler().runTaskLater(Practice.getInstance(), () -> {
                     profile.getPlayer().getInventory().setArmorContents(null);
                     profile.getPlayer().getInventory().setContents(Hotbar.getSpawnItems());
 
-                    profile.getPlayer().teleport(instance.getSpawnLocation());
+                    profile.getPlayer().teleport(Practice.getInstance().getSpawnLocation());
 
                     match.setMatchState(MatchState.ENDED);
                     match.getArena().setBusy(false);
@@ -130,11 +128,11 @@ public class MatchManager {
             for (Profile profile : profiles) {
                 profile.getPlayer().playSound(profile.getPlayer().getLocation(), Sound.NOTE_PLING, 0.5f, 0.5f);
 
-                instance.getServer().getScheduler().runTaskLater(instance, () -> {
+                Practice.getInstance().getServer().getScheduler().runTaskLater(Practice.getInstance(), () -> {
                     profile.getPlayer().getInventory().setArmorContents(null);
                     profile.getPlayer().getInventory().setContents(Hotbar.getSpawnItems());
 
-                    profile.getPlayer().teleport(instance.getSpawnLocation());
+                    profile.getPlayer().teleport(Practice.getInstance().getSpawnLocation());
 
                     match.setMatchState(MatchState.ENDED);
                     match.getArena().setBusy(false);

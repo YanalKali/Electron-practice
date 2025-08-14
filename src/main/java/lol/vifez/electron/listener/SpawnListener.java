@@ -18,24 +18,15 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
-/*
- * Copyright (c) 2025 Vifez. All rights reserved.
- * Unauthorized use or distribution is prohibited.
- */
-
 public class SpawnListener implements Listener {
 
-    private final Practice instance;
-
-    public SpawnListener(Practice instance) {
-        this.instance = instance;
-
-        instance.getServer().getPluginManager().registerEvents(this, instance);
+    public SpawnListener() {
+        Practice.getInstance().getServer().getPluginManager().registerEvents(this, Practice.getInstance());
     }
 
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent event) {
-        Profile profile = instance.getProfileManager().getProfile(event.getPlayer().getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(event.getPlayer().getUniqueId());
 
         if (profile.isEditMode()) {
             event.getItemDrop().remove();
@@ -47,15 +38,15 @@ public class SpawnListener implements Listener {
 
     @EventHandler
     public void onItemPickup(PlayerPickupItemEvent event) {
-        Profile profile = instance.getProfileManager().getProfile(event.getPlayer().getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(event.getPlayer().getUniqueId());
         event.setCancelled(!profile.inMatch() && !profile.isBuildMode());
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        Profile profile = instance.getProfileManager().getProfile(event.getPlayer().getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(event.getPlayer().getUniqueId());
 
-        if (profile.inMatch() && instance.getMatchManager().getMatch(profile.getUuid()).getArena().getType().toLowerCase().contains("build")) {
+        if (profile.inMatch() && Practice.getInstance().getMatchManager().getMatch(profile.getUuid()).getArena().getType().toLowerCase().contains("build")) {
             event.setCancelled(false);
         } else {
             event.setCancelled(!profile.inMatch() && !profile.isBuildMode());
@@ -64,9 +55,9 @@ public class SpawnListener implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        Profile profile = instance.getProfileManager().getProfile(event.getPlayer().getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(event.getPlayer().getUniqueId());
 
-        if (profile.inMatch() && instance.getMatchManager().getMatch(profile.getUuid()).getArena().getType().toLowerCase().contains("build")) {
+        if (profile.inMatch() && Practice.getInstance().getMatchManager().getMatch(profile.getUuid()).getArena().getType().toLowerCase().contains("build")) {
             event.setCancelled(false);
         } else {
             event.setCancelled(!profile.inMatch() && !profile.isBuildMode());
@@ -76,7 +67,7 @@ public class SpawnListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
 
         event.setCancelled(!profile.inMatch() && !profile.isEditMode() && !profile.isBuildMode());
     }
@@ -84,7 +75,7 @@ public class SpawnListener implements Listener {
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         Player player = (Player) event.getWhoClicked();
-        Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
 
         event.setCancelled(!profile.inMatch() && !profile.isEditMode() && !profile.isBuildMode());
     }
@@ -93,12 +84,11 @@ public class SpawnListener implements Listener {
     public void onDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+            Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
 
             if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
                 event.setCancelled(true);
-
-                player.teleport(instance.getSpawnLocation());
+                player.teleport(Practice.getInstance().getSpawnLocation());
                 return;
             }
 
@@ -108,11 +98,11 @@ public class SpawnListener implements Listener {
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (instance.getProfileManager().getProfile(event.getEntity().getUniqueId()) != null && instance.getProfileManager().getProfile(event.getEntity().getUniqueId()).inMatch()) return;
+        if (Practice.getInstance().getProfileManager().getProfile(event.getEntity().getUniqueId()) != null
+                && Practice.getInstance().getProfileManager().getProfile(event.getEntity().getUniqueId()).inMatch()) return;
 
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-
             player.setSaturation(20);
             player.setFoodLevel(20);
         }
@@ -122,7 +112,7 @@ public class SpawnListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        Profile profile = instance.getProfileManager().getProfile(event.getPlayer().getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(event.getPlayer().getUniqueId());
 
         if (profile.isEditMode()) {
             profile.setEditMode(false);
@@ -133,9 +123,12 @@ public class SpawnListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
-        Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+        Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
 
-        if (!event.getInventory().equals(player.getInventory()) && event.getInventory().getTitle() != null && event.getInventory().getTitle().equalsIgnoreCase(CC.colorize("&bKit Editor"))) {
+        if (!event.getInventory().equals(player.getInventory())
+                && event.getInventory().getTitle() != null
+                && event.getInventory().getTitle().equalsIgnoreCase(CC.colorize("&bKit Editor"))) {
+
             if (profile.isEditMode()) {
                 profile.setEditMode(false);
                 event.getPlayer().getInventory().setContents(Hotbar.getSpawnItems());

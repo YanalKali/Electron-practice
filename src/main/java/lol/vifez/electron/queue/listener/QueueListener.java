@@ -25,18 +25,15 @@ import org.bukkit.inventory.ItemStack;
 
 public class QueueListener implements Listener {
 
-    private final Practice instance;
-
-    public QueueListener(Practice instance) {
-        this.instance = instance;
-
+    public QueueListener() {
+        Practice instance = Practice.getInstance();
         instance.getServer().getPluginManager().registerEvents(this, instance);
     }
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        Queue queue = instance.getQueueManager().getQueue(player.getUniqueId());
+        Queue queue = Practice.getInstance().getQueueManager().getQueue(player.getUniqueId());
 
         if (queue != null) {
             queue.remove(player);
@@ -47,56 +44,39 @@ public class QueueListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Player player = event.getPlayer();
-
             ItemStack itemInHand = player.getInventory().getItemInHand();
+            Practice instance = Practice.getInstance();
 
-            if (itemInHand != null && itemInHand.isSimilar(Hotbar.UNRANKED.getItem())) {
-                event.setCancelled(true);
-                new UnrankedMenu(instance).openMenu(player);
-            }
+            if (itemInHand != null) {
+                if (itemInHand.isSimilar(Hotbar.UNRANKED.getItem())) {
+                    event.setCancelled(true);
+                    new UnrankedMenu(instance).openMenu(player);
+                } else if (itemInHand.isSimilar(Hotbar.LEADERBOARDS.getItem())) {
+                    event.setCancelled(true);
+                    new LeaderboardMenu(instance).openMenu(player);
+                } else if (itemInHand.isSimilar(Hotbar.SETTINGS.getItem())) {
+                    event.setCancelled(true);
+                    Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+                    if (profile != null) {
+                        new SettingsMenu(instance, profile).openMenu(player);
+                    } else {
+                        player.sendMessage(CC.translate("&cProfile not found!"));
+                    }
+                } else if (itemInHand.isSimilar(Hotbar.RANKED.getItem())) {
+                    event.setCancelled(true);
+                    new RankedMenu(instance).openMenu(player);
+                } else if (itemInHand.isSimilar(Hotbar.LEAVE_QUEUE.getItem())) {
+                    event.setCancelled(true);
+                    Queue queue = instance.getQueueManager().getQueue(player.getUniqueId());
+                    if (queue != null) queue.remove(player);
 
-            if (itemInHand != null && itemInHand.isSimilar(Hotbar.LEADERBOARDS.getItem())) {
-                event.setCancelled(true);
-                new LeaderboardMenu(instance).openMenu(player);
-            }
-
-            if (itemInHand != null && itemInHand.isSimilar(Hotbar.SETTINGS.getItem())) {
-                event.setCancelled(true);
-                Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
-                if (profile != null) {
-                    new SettingsMenu(instance, profile).openMenu(player);
-                } else {
-                    player.sendMessage(CC.translate("&cProfile not found!"));
+                    player.getInventory().setContents(Hotbar.getSpawnItems());
+                    player.getInventory().setArmorContents(null);
+                    CC.sendMessage(player, "&cYou left the queue!");
+                } else if (itemInHand.isSimilar(Hotbar.KIT_EDITOR.getItem())) {
+                    event.setCancelled(true);
+                    new KitSelectionMenu(instance).openMenu(player);
                 }
-            }
-
-
-            if (itemInHand != null && itemInHand.isSimilar(Hotbar.RANKED.getItem())) {
-                event.setCancelled(true);
-                new RankedMenu(instance).openMenu(player);
-
-
-            } else if (itemInHand.isSimilar(Hotbar.LEAVE_QUEUE.getItem())) {
-                event.setCancelled(true);
-
-                Queue queue = instance.getQueueManager().getQueue(player.getUniqueId());
-
-                if (queue != null) {
-                    queue.remove(player);
-                }
-
-                player.getInventory().setContents(Hotbar.getSpawnItems());
-                player.getInventory().setArmorContents(null);
-
-                CC.sendMessage(player, "&cYou left the queue!");
-            } else if (itemInHand.isSimilar(Hotbar.KIT_EDITOR.getItem())) {
-                event.setCancelled(true);
-
-                new KitSelectionMenu(instance).openMenu(player);
-            } else if (itemInHand.isSimilar(Hotbar.LEADERBOARDS.getItem())) {
-                event.setCancelled(true);
-
-                new LeaderboardMenu(instance).openMenu(player);
             }
         }
     }

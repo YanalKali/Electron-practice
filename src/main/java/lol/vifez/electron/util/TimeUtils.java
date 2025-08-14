@@ -7,249 +7,188 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author langgezockt (langgezockt@gmail.com)
- * 11.06.2019 / 09:55
- * iUtils / invictusgames.iutils.utils
- */
-
 public class TimeUtils {
 
     public static final long MINUTE = TimeUnit.MINUTES.toSeconds(1);
     private static final ThreadLocal<StringBuilder> mmssBuilder = ThreadLocal.withInitial(StringBuilder::new);
 
     public static long parseTime(String input) {
-        if (input.equals("0") || input.equals("") || input.equalsIgnoreCase("0s")) {
+        if (input == null || input.isEmpty() || input.equals("0") || input.equalsIgnoreCase("0s")) {
             return 0;
         }
 
-        String[] lifeMatch = { "w", "d", "h", "m", "s" };
-        long[] lifeInterval = {
-                TimeUnit.DAYS.toMillis(7), //w
-                TimeUnit.DAYS.toMillis(1), //d
-                TimeUnit.HOURS.toMillis(1), //h
-                TimeUnit.MINUTES.toMillis(1), //m
-                TimeUnit.SECONDS.toMillis(1)  //s
+        String[] units = {"w", "d", "h", "m", "s"};
+        long[] multipliers = {
+                TimeUnit.DAYS.toMillis(7),
+                TimeUnit.DAYS.toMillis(1),
+                TimeUnit.HOURS.toMillis(1),
+                TimeUnit.MINUTES.toMillis(1),
+                TimeUnit.SECONDS.toMillis(1)
         };
-        long millis = -1;
-        for (int i = 0; i < lifeMatch.length; ++i) {
-            Matcher matcher = Pattern.compile("([0-9]+)" + lifeMatch[i]).matcher(input);
+
+        long millis = 0;
+        for (int i = 0; i < units.length; i++) {
+            Matcher matcher = Pattern.compile("(\\d+)" + units[i]).matcher(input);
             while (matcher.find()) {
-                long matched = Long.parseLong(matcher.group(1));
-                if (matched < 0)
-                    continue;
-
-                if (millis == -1)
-                    millis = 0;
-
-                millis += matched * lifeInterval[i];
+                millis += Long.parseLong(matcher.group(1)) * multipliers[i];
             }
         }
-        return millis;
+
+        return millis == 0 ? -1 : millis;
+    }
+
+    public static long parseDuration(String duration) {
+        if (duration == null || duration.isEmpty()) return 0;
+
+        long multiplier = 1000;
+        char unit = duration.charAt(duration.length() - 1);
+
+        switch (unit) {
+            case 's':
+                multiplier = 1000;
+                break;
+            case 'm':
+                multiplier = 60 * 1000;
+                break;
+            case 'h':
+                multiplier = 60 * 60 * 1000;
+                break;
+            case 'd':
+                multiplier = 24 * 60 * 60 * 1000;
+                break;
+            default:
+                unit = ' ';
+                break;
+        }
+
+        String number = (unit == 's' || unit == 'm' || unit == 'h' || unit == 'd')
+                ? duration.substring(0, duration.length() - 1)
+                : duration;
+
+        try {
+            return Long.parseLong(number) * multiplier;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public static String formatDetailed(long input) {
-        if (input == -1) {
-            return "Permanent";
-        }
-
         return formatDetailed(input, TimeUnit.MILLISECONDS);
     }
 
-    public static String formatDetailed(long input, TimeUnit timeUnit) {
-        if (input == -1) {
-            return "Permanent";
-        }
+    public static String formatDetailed(long input, TimeUnit unit) {
+        if (input == -1) return "Permanent";
 
-        long secs = timeUnit.toSeconds(input);
+        long seconds = unit.toSeconds(input);
+        if (seconds == 0) return "0 seconds";
 
-        if (secs == 0) {
-            return "0 seconds";
-        }
+        long days = seconds / 86400;
+        long hours = (seconds % 86400) / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
 
-        long remainder = secs % 86400;
-        long days = secs / 86400;
-        long hours = remainder / 3600;
-        long minutes = remainder / 60 - hours * 60;
-        long seconds = remainder % 3600 - minutes * 60;
-        String fDays = (days > 0) ? (" " + days + " day" + ((days > 1) ? "s" : "")) : "";
-        String fHours = (hours > 0) ? (" " + hours + " hour" + ((hours > 1) ? "s" : "")) : "";
-        String fMinutes = (minutes > 0) ? (" " + minutes + " minute" + ((minutes > 1) ? "s" : "")) : "";
-        String fSeconds = (seconds > 0) ? (" " + seconds + " second" + ((seconds > 1) ? "s" : "")) : "";
-        return  (fDays + fHours + fMinutes + fSeconds).trim();
+        return formatParts(days, "day") + formatParts(hours, "hour") +
+                formatParts(minutes, "minute") + formatParts(secs, "second");
     }
 
-    public static String formatTimeAgo(long input) {
-        return formatTimeAgo(input, TimeUnit.MILLISECONDS);
+    public static String formatTimeShort(long input) {
+        return formatTimeShort(input, TimeUnit.MILLISECONDS);
     }
 
-    public static String formatTimeAgo(long input, TimeUnit timeUnit) {
-        long time = System.currentTimeMillis() - timeUnit.toMillis(input);
+    public static String formatTimeShort(long input, TimeUnit unit) {
+        if (input == -1) return "Permanent";
 
-        if (time >= TimeUnit.DAYS.toMillis(365)) {
-            time = time / TimeUnit.DAYS.toMillis(365);
-            return time + " year" + (time == 1 ? "" : "s") + " ago";
-        }
+        long seconds = unit.toSeconds(input);
+        if (seconds == 0) return "0 seconds";
 
-        if (time >= TimeUnit.DAYS.toMillis(30)) {
-            time = time / TimeUnit.DAYS.toMillis(30);
-            return time + " month" + (time == 1 ? "" : "s") + " ago";
-        }
+        long days = seconds / 86400;
+        long hours = (seconds % 86400) / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
 
-        if (time >= TimeUnit.DAYS.toMillis(1)) {
-            time = time / TimeUnit.DAYS.toMillis(1);
-            return time + " day" + (time == 1 ? "" : "s") + " ago";
-        }
+        return formatShortParts(days, "d") + formatShortParts(hours, "h") +
+                formatShortParts(minutes, "m") + formatShortParts(secs, "s");
+    }
 
-        if (time >= TimeUnit.HOURS.toMillis(1)) {
-            time = time / TimeUnit.HOURS.toMillis(1);
-            return time + " hour" + (time == 1 ? "" : "s") + " ago";
-        }
+    private static String formatParts(long value, String label) {
+        if (value <= 0) return "";
+        return " " + value + " " + label + (value > 1 ? "s" : "");
+    }
 
-        if (time >= TimeUnit.MINUTES.toMillis(1)) {
-            time = time / TimeUnit.MINUTES.toMillis(1);
-            return time + " minute" + (time == 1 ? "" : "s") + " ago";
-        }
-
-        if (time >= TimeUnit.SECONDS.toMillis(1)) {
-            time = time / TimeUnit.SECONDS.toMillis(1);
-            return time + " second" + (time == 1 ? "" : "s") + " ago";
-        }
-
-        return "now";
+    private static String formatShortParts(long value, String label) {
+        return value > 0 ? " " + value + label : "";
     }
 
     public static String formatHHMMSS(long input) {
         return formatHHMMSS(input, false, TimeUnit.MILLISECONDS);
     }
 
-    public static String formatHHMMSS(long input, TimeUnit timeUnit) {
-        return formatHHMMSS(input, false, timeUnit);
+    public static String formatHHMMSS(long input, TimeUnit unit) {
+        return formatHHMMSS(input, false, unit);
     }
 
-    public static String formatHHMMSS(long input, boolean millis) {
-        return formatHHMMSS(input, millis, TimeUnit.MILLISECONDS);
+    public static String formatHHMMSS(long input, boolean displayMillis) {
+        return formatHHMMSS(input, displayMillis, TimeUnit.MILLISECONDS);
     }
 
-    public static String formatHHMMSS(long input, boolean displayMillis, TimeUnit timeUnit) {
-        long secs = timeUnit.toSeconds(input);
-
-        if (displayMillis && secs < MINUTE) {
-            long millis = timeUnit.toMillis(input);
-
-            long milliseconds = millis % 1000;
-            millis -= milliseconds;
-
-            long seconds = millis / 1000;
-            return seconds + "." + (milliseconds / 100) + "s";
+    public static String formatHHMMSS(long input, boolean displayMillis, TimeUnit unit) {
+        long totalSeconds = unit.toSeconds(input);
+        if (displayMillis && totalSeconds < MINUTE) {
+            long millis = unit.toMillis(input);
+            long ms = millis % 1000;
+            return (millis / 1000) + "." + (ms / 100) + "s";
         }
 
-        long seconds = secs % 60;
-        secs -= seconds;
+        long seconds = totalSeconds % 60;
+        long minutes = (totalSeconds / 60) % 60;
+        long hours = totalSeconds / 3600;
 
-        long minutesCount = secs / 60;
-        long minutes = minutesCount % 60L;
-        minutesCount -= minutes;
+        StringBuilder sb = mmssBuilder.get();
+        sb.setLength(0);
 
-        long hours = minutesCount / 60L;
-
-        StringBuilder result = TimeUtils.mmssBuilder.get();
-        result.setLength(0);
-
-        if (hours > 0L) {
-            if (hours < 10L)
-                result.append("0");
-
-            result.append(hours);
-            result.append(":");
-        }
-
-        if (minutes < 10L)
-            result.append("0");
-
-        result.append(minutes);
-        result.append(":");
-
-        if (seconds < 10)
-            result.append("0");
-
-        result.append(seconds);
-        return result.toString();
+        if (hours > 0) sb.append(String.format("%02d:", hours));
+        sb.append(String.format("%02d:%02d", minutes, seconds));
+        return sb.toString();
     }
 
-    public static String formatTimeShort(long input) {
-        if (input == -1) {
-            return "Permanent";
-        }
-
-        return formatTimeShort(input, TimeUnit.MILLISECONDS);
+    public static String formatTimeAgo(long input) {
+        return formatTimeAgo(input, TimeUnit.MILLISECONDS);
     }
 
-    public static String formatTimeShort(long input, TimeUnit timeUnit) {
-        if (input == -1) {
-            return "Permanent";
-        }
+    public static String formatTimeAgo(long input, TimeUnit unit) {
+        long elapsed = System.currentTimeMillis() - unit.toMillis(input);
 
-        long secs = timeUnit.toSeconds(input);
+        if (elapsed < 1000) return "now";
 
-        if (secs == 0) {
-            return "0 seconds";
-        }
+        if (elapsed >= TimeUnit.DAYS.toMillis(365)) return formatElapsed(elapsed, TimeUnit.DAYS.toMillis(365), "year");
+        if (elapsed >= TimeUnit.DAYS.toMillis(30)) return formatElapsed(elapsed, TimeUnit.DAYS.toMillis(30), "month");
+        if (elapsed >= TimeUnit.DAYS.toMillis(1)) return formatElapsed(elapsed, TimeUnit.DAYS.toMillis(1), "day");
+        if (elapsed >= TimeUnit.HOURS.toMillis(1)) return formatElapsed(elapsed, TimeUnit.HOURS.toMillis(1), "hour");
+        if (elapsed >= TimeUnit.MINUTES.toMillis(1)) return formatElapsed(elapsed, TimeUnit.MINUTES.toMillis(1), "minute");
+        return formatElapsed(elapsed, TimeUnit.SECONDS.toMillis(1), "second");
+    }
 
-        long remainder = secs % 86400;
-        long days = secs / 86400;
-        long hours = remainder / 3600;
-        long minutes = remainder / 60 - hours * 60;
-        long seconds = remainder % 3600 - minutes * 60;
-        String fDays = (days > 0) ? (" " + days + "d") : "";
-        String fHours = (hours > 0) ? (" " + hours + "h") : "";
-        String fMinutes = (minutes > 0) ? (" " + minutes + "m") : "";
-        String fSeconds = (seconds > 0) ? (" " + seconds + "s") : "";
-        return  (fDays + fHours + fMinutes + fSeconds).trim();
+    private static String formatElapsed(long elapsed, long unitMillis, String label) {
+        long value = elapsed / unitMillis;
+        return value + " " + label + (value > 1 ? "s" : "") + " ago";
     }
 
     public static String formatDate(long input) {
         return formatDate(input, true, PracticeConstant.TIME_ZONE);
     }
 
-    public static String formatDate(long input, boolean time) {
-        return formatDate(input, time, PracticeConstant.TIME_ZONE);
+    public static String formatDate(long input, boolean showTime) {
+        return formatDate(input, showTime, PracticeConstant.TIME_ZONE);
     }
 
-    public static String formatDate(long input, TimeZone timeZone) {
-        return formatDate(input, true, timeZone);
+    public static String formatDate(long input, TimeZone tz) {
+        return formatDate(input, true, tz);
     }
 
-    public static String formatDate(long input, boolean time, TimeZone timeZone) {
-        if (input == -1) {
-            return "Permanent";
-        }
-        DateFormat formatter = new SimpleDateFormat("MM/dd/yy" + (time ? " hh:mm:ss a" : "") + " z");
-        formatter.setTimeZone(timeZone);
+    public static String formatDate(long input, boolean showTime, TimeZone tz) {
+        if (input == -1) return "Permanent";
+        DateFormat formatter = new SimpleDateFormat("MM/dd/yy" + (showTime ? " hh:mm:ss a" : "") + " z");
+        formatter.setTimeZone(tz);
         return formatter.format(input);
     }
-
-    public static long parseDuration(String duration) {
-        long multiplier = 1000; // Default multiplier for seconds
-        if (duration.endsWith("s")) {
-            multiplier = 1000; // Seconds
-            duration = duration.substring(0, duration.length() - 1);
-        } else if (duration.endsWith("m")) {
-            multiplier = 60 * 1000; // Minutes
-            duration = duration.substring(0, duration.length() - 1);
-        } else if (duration.endsWith("h")) {
-            multiplier = 60 * 60 * 1000; // Hours
-            duration = duration.substring(0, duration.length() - 1);
-        } else if (duration.endsWith("d")) {
-            multiplier = 24 * 60 * 60 * 1000; // Days
-            duration = duration.substring(0, duration.length() - 1);
-        }
-
-        try {
-            return Long.parseLong(duration) * multiplier;
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid duration format: " + duration);
-        }
-    }
-
 }

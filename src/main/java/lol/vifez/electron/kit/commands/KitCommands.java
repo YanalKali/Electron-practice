@@ -8,7 +8,6 @@ import lol.vifez.electron.kit.enums.KitType;
 import lol.vifez.electron.util.CC;
 import lol.vifez.electron.util.messages.ErrorMessages;
 import lol.vifez.electron.util.messages.SuccessMessages;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,12 +18,11 @@ import org.bukkit.inventory.ItemStack;
  * Unauthorized use or distribution is prohibited.
  */
 
-@RequiredArgsConstructor
 @CommandAlias("kit")
 @CommandPermission("electron.admin")
 public class KitCommands extends BaseCommand {
 
-    private final Practice instance;
+    private final Practice instance = Practice.getInstance();
 
     @Default
     public void onKitCommand(CommandSender sender) {
@@ -101,7 +99,6 @@ public class KitCommands extends BaseCommand {
         }
 
         kit.setIcon(itemInHand.getType());
-
         CC.sendMessage(player, String.format(SuccessMessages.ICON_UPDATED, kit.getName()));
     }
 

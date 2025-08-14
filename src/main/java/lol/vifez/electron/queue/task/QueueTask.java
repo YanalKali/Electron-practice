@@ -1,5 +1,6 @@
 package lol.vifez.electron.queue.task;
 
+import lol.vifez.electron.Practice;
 import lol.vifez.electron.kit.Kit;
 import lol.vifez.electron.queue.Queue;
 import lol.vifez.electron.queue.QueueManager;
@@ -18,12 +19,12 @@ public class QueueTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        for (Kit kit : queueManager.getInstance().getKitManager().getKits().values()) {
+        for (Kit kit : Practice.getInstance().getKitManager().getKits().values()) {
             if (queueManager.getQueue(kit, false) == null) {
-                queueManager.getQueueMap().put(kit.getName(), new Queue(queueManager.getInstance(), kit));
+                queueManager.getQueueMap().put(kit.getName(), new Queue(Practice.getInstance(), kit));
 
                 if (kit.isRanked()) {
-                    queueManager.getQueueMap().put("ranked_" + kit.getName(), new Queue(queueManager.getInstance(), kit));
+                    queueManager.getQueueMap().put("ranked_" + kit.getName(), new Queue(Practice.getInstance(), kit));
                 }
             }
         }

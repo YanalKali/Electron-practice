@@ -1,6 +1,5 @@
 package lol.vifez.electron.arena.menu;
 
-import lol.vifez.electron.Practice;
 import lol.vifez.electron.arena.Arena;
 import lol.vifez.electron.arena.manager.ArenaManager;
 import lol.vifez.electron.util.ItemBuilder;
@@ -10,7 +9,6 @@ import lol.vifez.electron.util.menu.button.impl.EasyButton;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -22,12 +20,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ArenasMenu extends Menu {
 
-    private final Practice instance;
     private final ArenaManager arenaManager;
 
     @Override
     public String getTitle(Player player) {
-        return "&9&l❖ Arenas ❖";
+        return "&b&lArenas";
     }
 
     @Override
@@ -47,7 +44,8 @@ public class ArenasMenu extends Menu {
                             .name("&b&l⚔ " + arena.getName())
                             .lore(getArenaLore(arena))
                             .build(),
-                    true, false, () -> {}
+                    true, false, () -> {
+            }
             ));
         }
 
@@ -72,17 +70,16 @@ public class ArenasMenu extends Menu {
 
     private List<String> getArenaLore(Arena arena) {
         List<String> lore = new ArrayList<>();
-        lore.add("&7&m-------------------");
+        lore.add(" ");
         lore.add("&7Type: &b" + arena.getType());
         lore.add("&7Spawn A: " + formatStatus(arena.getSpawnA() != null));
         lore.add("&7Spawn B: " + formatStatus(arena.getSpawnB() != null));
         lore.add("&7Kits: " + (arena.getKits().isEmpty() ? "&cNone" : "&a" + String.join(", ", arena.getKits())));
         lore.add("&7Status: " + (arena.isBusy() ? "&cBusy" : "&aAvailable"));
-        lore.add("&7&m-------------------");
         return lore;
     }
 
     private String formatStatus(boolean status) {
-        return status ? "&a✔ Set" : "&c✘ Not Set";
+        return status ? "&a✔ Set" : "&cNot Set";
     }
 }

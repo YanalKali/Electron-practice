@@ -32,6 +32,6 @@ public class ArenasCommand extends BaseCommand {
         }
 
         Player player = (Player) sender;
-        new ArenasMenu(plugin, plugin.getArenaManager()).openMenu(player);
+        new ArenasMenu(plugin.getArenaManager()).openMenu(player);
     }
 }

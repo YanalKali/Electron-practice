@@ -20,27 +20,24 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class QueueManager {
 
-    private final Practice instance;
     private final Map<String, Queue> queueMap;
     private final Map<UUID, Queue> playersQueue;
 
-    public QueueManager(Practice instance) {
-        this.instance = instance;
+    public QueueManager() {
         this.queueMap = new ConcurrentHashMap<>();
         this.playersQueue = new HashMap<>();
 
-        for (Kit kit : instance.getKitManager().getKits().values()) {
-            queueMap.put(kit.getName(), new Queue(instance, kit));
+        for (Kit kit : Practice.getInstance().getKitManager().getKits().values()) {
+            queueMap.put(kit.getName(), new Queue(Practice.getInstance(), kit));
 
             if (kit.isRanked()) {
-                queueMap.put("ranked_" + kit.getName(), new Queue(instance, kit));
+                queueMap.put("ranked_" + kit.getName(), new Queue(Practice.getInstance(), kit));
             }
         }
 
-        new QueueTask(this).runTaskTimerAsynchronously(instance, 20L, 20L);
-        new ActionBarTask(instance).runTaskTimer(instance, 0L, 20L);
-        new QueueTask(this).runTaskTimerAsynchronously(instance, 20L, 20L);
-        new QueueListener(instance);
+        new QueueTask(this).runTaskTimerAsynchronously(Practice.getInstance(), 20L, 20L);
+        new ActionBarTask(Practice.getInstance()).runTaskTimer(Practice.getInstance(), 0L, 20L);
+        new QueueTask(this).runTaskTimerAsynchronously(Practice.getInstance(), 20L, 20L);
     }
 
     public Queue getQueue(Kit kit, boolean ranked) {
@@ -48,16 +45,16 @@ public class QueueManager {
     }
 
     public Queue getQueue(UUID uuid) {
-        return queueMap.get(instance.getProfileManager().getProfile(uuid).getCurrentQueue());
+        return queueMap.get(Practice.getInstance().getProfileManager().getProfile(uuid).getCurrentQueue());
     }
 
     public int getAllQueueSize() {
-        int i = 0;
+        int size = 0;
 
         for (Queue ignored : queueMap.values()) {
-            i += playersQueue.size();
+            size += playersQueue.size();
         }
 
-        return i;
+        return size;
     }
 }

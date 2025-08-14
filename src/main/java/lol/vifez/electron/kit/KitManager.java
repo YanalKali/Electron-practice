@@ -15,17 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class KitManager {
 
-    private final Practice instance;
     private final Map<String, Kit> kits;
 
-    public KitManager(Practice instance) {
-        this.instance = instance;
+    public KitManager() {
         this.kits = new ConcurrentHashMap<>();
 
-        ConfigurationSection section = instance.getKitsFile().getConfiguration().getConfigurationSection("kits");
+        ConfigurationSection section = Practice.getInstance().getKitsFile().getConfiguration().getConfigurationSection("kits");
 
         if (section != null) {
-            section.getKeys(false).forEach(key -> kits.put(key.toLowerCase(), instance.getGson().fromJson(section.getString(key), Kit.class)));
+            section.getKeys(false).forEach(key -> kits.put(key.toLowerCase(), Practice.getInstance().getGson().fromJson(section.getString(key), Kit.class)));
         }
     }
 
@@ -40,12 +38,15 @@ public class KitManager {
     public void delete(Kit kit) {
         kits.remove(kit.getName().toLowerCase());
 
-        instance.getKitsFile().getConfiguration().set("kits." + kit.getName().toLowerCase(), null);
-        instance.getKitsFile().save();
+        Practice.getInstance().getKitsFile().getConfiguration().set("kits." + kit.getName().toLowerCase(), null);
+        Practice.getInstance().getKitsFile().save();
     }
 
     public void close() {
-        kits.values().forEach(kit -> instance.getKitsFile().getConfiguration().set("kits." + kit.getName().toLowerCase(), instance.getGson().toJson(kit)));
-        instance.getKitsFile().save();
+        kits.values().forEach(kit ->
+                Practice.getInstance().getKitsFile().getConfiguration()
+                        .set("kits." + kit.getName().toLowerCase(), Practice.getInstance().getGson().toJson(kit))
+        );
+        Practice.getInstance().getKitsFile().save();
     }
 }
