@@ -31,27 +31,8 @@ public class PracticeScoreboard implements AssembleAdapter {
     @Override
     public String getTitle(Player player) {
         Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
-        Match match = instance.getMatchManager().getMatch(profile.getUuid());
-
         if (!profile.isScoreboardEnabled()) return "";
-
-        if (match != null) {
-            if (match.getMatchState() == MatchState.STARTED) {
-                if (match.getKit().getKitType() == KitType.BOXING) {
-                    return instance.getConfig().getString("scoreboard.in-boxing.title");
-                } else {
-                    return instance.getConfig().getString("scoreboard.in-game.title");
-                }
-            } else if (match.getMatchState() == MatchState.STARTING) {
-                return instance.getConfig().getString("scoreboard.match-starting.title");
-            } else if (match.getMatchState() == MatchState.ENDING) {
-                return instance.getConfig().getString("scoreboard.match-ending.title");
-            }
-        } else if (instance.getQueueManager().getQueue(profile.getUuid()) != null) {
-            return instance.getConfig().getString("scoreboard.in-queue.title");
-        }
-
-        return instance.getConfig().getString("scoreboard.in-lobby.title");
+        return instance.getConfig().getString("scoreboard.title");
     }
 
     @Override
@@ -73,7 +54,7 @@ public class PracticeScoreboard implements AssembleAdapter {
                 if (match.getKit().getKitType() == KitType.BOXING) {
                     for (String str : instance.getConfig().getStringList("scoreboard.in-boxing.lines")) {
                         list.add(str
-                                .replace("<ping>", instance.getProfileManager().getProfile(player.getUniqueId()).getPing() + "")
+                                .replace("<ping>", profile.getPing() + "")
                                 .replace("<opponent-ping>", match.getOpponent(player).getPing() + "")
                                 .replace("<opponent>", match.getOpponent(player).getName())
                                 .replace("<duration>", match.getDuration())
@@ -86,7 +67,7 @@ public class PracticeScoreboard implements AssembleAdapter {
                 } else {
                     for (String str : instance.getConfig().getStringList("scoreboard.in-game.lines")) {
                         list.add(str
-                                .replace("<ping>", instance.getProfileManager().getProfile(player.getUniqueId()).getPing() + "")
+                                .replace("<ping>", profile.getPing() + "")
                                 .replace("<opponent-ping>", match.getOpponent(player).getPing() + "")
                                 .replace("<opponent>", match.getOpponent(player).getName())
                                 .replace("<duration>", match.getDuration())
@@ -98,13 +79,17 @@ public class PracticeScoreboard implements AssembleAdapter {
                 for (String str : instance.getConfig().getStringList("scoreboard.match-ending.lines")) {
                     list.add(str
                             .replace("<winner>", match.getWinner() == null ? "None" : match.getWinner().getName())
-                            .replace("<loser>", match.getWinner() == null ? player.getName() + " " + match.getOpponent(player).getName() : match.getOpponent(match.getWinner().getPlayer()).getName()));
+                            .replace("<loser>", match.getWinner() == null
+                                    ? player.getName() + " " + match.getOpponent(player).getName()
+                                    : match.getOpponent(match.getWinner().getPlayer()).getName()));
                 }
             } else if (match.getMatchState() == MatchState.STARTING) {
                 for (String str : instance.getConfig().getStringList("scoreboard.match-starting.lines")) {
                     list.add(str
                             .replace("<winner>", match.getWinner() == null ? "None" : match.getWinner().getName())
-                            .replace("<loser>", match.getWinner() == null ? player.getName() + " " + match.getOpponent(player).getName() : match.getOpponent(match.getWinner().getPlayer()).getName()));
+                            .replace("<loser>", match.getWinner() == null
+                                    ? player.getName() + " " + match.getOpponent(player).getName()
+                                    : match.getOpponent(match.getWinner().getPlayer()).getName()));
                 }
             }
         } else if (instance.getQueueManager().getQueue(profile.getUuid()) != null) {
@@ -123,7 +108,7 @@ public class PracticeScoreboard implements AssembleAdapter {
                 list.add(str.replace("<online>", Bukkit.getOnlinePlayers().size() + "")
                         .replace("<in-queue>", instance.getQueueManager().getAllQueueSize() + "")
                         .replace("<playing>", instance.getMatchManager().getAllMatchSize() + "")
-                        .replace("<ping>", instance.getProfileManager().getProfile(player.getUniqueId()).getPing() + "")
+                        .replace("<ping>", profile.getPing() + "")
                         .replace("<username>", player.getName())
                         .replace("<global-elo>", globalElo)
                         .replace("<division>", division));
