@@ -2,6 +2,7 @@ package lol.vifez.electron.scoreboard;
 
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 import lol.vifez.electron.Practice;
+import lol.vifez.electron.kit.Kit;
 import lol.vifez.electron.kit.enums.KitType;
 import lol.vifez.electron.match.Match;
 import lol.vifez.electron.elo.EloUtil;
@@ -85,9 +86,13 @@ public class PracticeScoreboard implements AssembleAdapter {
 
         } else if (instance.getQueueManager().getQueue(profile.getUuid()) != null) {
             for (String str : scoreboardConfig.getStringList("scoreboard.in-queue.lines")) {
+                Kit queueKit = instance.getQueueManager().getQueue(profile.getUuid()).getKit();
+                boolean isRanked = instance.getQueueManager().getQueue(profile.getUuid()).isRanked();
+                String typeTag = isRanked ? "&c[R]" : "&7[UR]";
+
                 list.add(str.replace("<online>", String.valueOf(Bukkit.getOnlinePlayers().size()))
                         .replace("<in-queue>", String.valueOf(instance.getQueueManager().getAllQueueSize()))
-                        .replace("<kit>", instance.getQueueManager().getQueue(profile.getUuid()).getKit().getName())
+                        .replace("<kit>", queueKit.getName() + " " + typeTag)
                         .replace("<time>", instance.getQueueManager().getQueue(profile.getUuid()).getQueueTime(profile.getUuid()))
                         .replace("<playing>", String.valueOf(instance.getMatchManager().getAllMatchSize()))
                         .replace("<username>", player.getName())
