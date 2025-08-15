@@ -2,14 +2,11 @@ package lol.vifez.electron.queue;
 
 import lol.vifez.electron.Practice;
 import lol.vifez.electron.kit.Kit;
-import lol.vifez.electron.queue.listener.QueueListener;
 import lol.vifez.electron.queue.task.ActionBarTask;
 import lol.vifez.electron.queue.task.QueueTask;
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*
@@ -28,16 +25,15 @@ public class QueueManager {
         this.playersQueue = new HashMap<>();
 
         for (Kit kit : Practice.getInstance().getKitManager().getKits().values()) {
-            queueMap.put(kit.getName(), new Queue(Practice.getInstance(), kit));
+            queueMap.put(kit.getName(), new Queue(Practice.getInstance(), kit, false));
 
             if (kit.isRanked()) {
-                queueMap.put("ranked_" + kit.getName(), new Queue(Practice.getInstance(), kit));
+                queueMap.put("ranked_" + kit.getName(), new Queue(Practice.getInstance(), kit, true));
             }
         }
 
         new QueueTask(this).runTaskTimerAsynchronously(Practice.getInstance(), 20L, 20L);
         new ActionBarTask(Practice.getInstance()).runTaskTimer(Practice.getInstance(), 0L, 20L);
-        new QueueTask(this).runTaskTimerAsynchronously(Practice.getInstance(), 20L, 20L);
     }
 
     public Queue getQueue(Kit kit, boolean ranked) {
@@ -51,10 +47,16 @@ public class QueueManager {
     public int getAllQueueSize() {
         int size = 0;
 
-        for (Queue ignored : queueMap.values()) {
-            size += playersQueue.size();
+        for (Queue queue : queueMap.values()) {
+            size += queue.getQueueSize();
         }
 
         return size;
+    }
+
+    public List<UUID> getPlayersInQueue(Kit kit, boolean ranked) {
+        Queue queue = getQueue(kit, ranked);
+        if (queue == null) return Collections.emptyList();
+        return new ArrayList<>(queue.getPlayerJoinTimes().keySet());
     }
 }

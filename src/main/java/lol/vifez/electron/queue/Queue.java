@@ -25,15 +25,16 @@ public class Queue {
 
     private final Practice instance;
     private final Kit kit;
-    private final boolean ranked = false;
+    private final boolean ranked;
 
     private final Map<UUID, Long> playerJoinTimes;
 
     private int rankedIndex = 1;
 
-    public Queue(Practice instance, Kit kit) {
+    public Queue(Practice instance, Kit kit, boolean ranked) {
         this.instance = instance;
         this.kit = kit;
+        this.ranked = ranked;
         this.playerJoinTimes = new ConcurrentHashMap<>();
     }
 
@@ -102,8 +103,13 @@ public class Queue {
             return;
         }
 
+        final Player finalTwo = two;
+
         Bukkit.getScheduler().runTask(instance, () -> {
-            Match match = new Match(instance, instance.getProfileManager().getProfile(one.getUniqueId()), instance.getProfileManager().getProfile(two.getUniqueId()), kit, arena, ranked);
+            Match match = new Match(instance,
+                    instance.getProfileManager().getProfile(one.getUniqueId()),
+                    instance.getProfileManager().getProfile(finalTwo.getUniqueId()),
+                    kit, arena, ranked);
 
             instance.getMatchManager().start(match);
         });
@@ -127,6 +133,10 @@ public class Queue {
 
         player.getInventory().setArmorContents(null);
         player.getInventory().setContents(Hotbar.getSpawnItems());
+    }
+
+    public int getQueueSize() {
+        return playerJoinTimes.size();
     }
 
     public String getQueueTime(UUID playerId) {

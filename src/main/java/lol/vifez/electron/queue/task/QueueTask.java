@@ -21,10 +21,10 @@ public class QueueTask extends BukkitRunnable {
     public void run() {
         for (Kit kit : Practice.getInstance().getKitManager().getKits().values()) {
             if (queueManager.getQueue(kit, false) == null) {
-                queueManager.getQueueMap().put(kit.getName(), new Queue(Practice.getInstance(), kit));
+                queueManager.getQueueMap().put(kit.getName(), new Queue(Practice.getInstance(), kit, false));
 
                 if (kit.isRanked()) {
-                    queueManager.getQueueMap().put("ranked_" + kit.getName(), new Queue(Practice.getInstance(), kit));
+                    queueManager.getQueueMap().put("ranked_" + kit.getName(), new Queue(Practice.getInstance(), kit, true));
                 }
             }
         }

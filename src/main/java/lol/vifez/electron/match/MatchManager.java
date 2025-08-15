@@ -1,6 +1,7 @@
 package lol.vifez.electron.match;
 
 import lol.vifez.electron.Practice;
+import lol.vifez.electron.kit.Kit;
 import lol.vifez.electron.match.enums.MatchState;
 import lol.vifez.electron.match.event.MatchEndEvent;
 import lol.vifez.electron.match.event.MatchStartEvent;
@@ -32,6 +33,14 @@ public class MatchManager {
 
     public Match getMatch(UUID uuid) {
         return matches.get(uuid);
+    }
+
+    public int getPlayersInKitMatches(Kit kit) {
+        return matches.values().stream()
+                .filter(match -> match.getKit().equals(kit))
+                .filter(match -> match.getMatchState() == MatchState.STARTED)
+                .mapToInt(match -> 2)
+                .sum();
     }
 
     public void remove(UUID uuid) {
