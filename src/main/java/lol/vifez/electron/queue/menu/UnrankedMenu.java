@@ -28,7 +28,7 @@ public class UnrankedMenu extends Menu {
 
     @Override
     public String getTitle(Player player) {
-        return "&7Solo Unranked Queue";
+        return "&7Select a kit...";
     }
 
     @Override
@@ -48,7 +48,7 @@ public class UnrankedMenu extends Menu {
         }
 
         int[] borderSlots = {
-                0, 1, 2, 3, 4, 5, 6, 7, 8,
+                0, 1, 2, 3, 5, 6, 7, 8,
                 9, 17, 18, 26, 27, 35,
                 36, 37, 38, 39, 40, 41, 42, 43, 44
         };
@@ -61,6 +61,33 @@ public class UnrankedMenu extends Menu {
                             .build(),
                     true, false, () -> {}));
         }
+
+        buttons.put(4, new EasyButton(
+                new ItemBuilder(Material.FIREWORK)
+                        .name("&b&lRandom Queue")
+                        .lore("&7Click to queue into a random kit")
+                        .build(),
+                true,
+                false,
+                () -> {
+                    if (kits.length == 0) {
+                        CC.sendMessage(player, "&cNo kits available to queue.");
+                        return;
+                    }
+
+                    Kit randomKit = kits[(int) (Math.random() * kits.length)];
+                    Profile profile = instance.getProfileManager().getProfile(player.getUniqueId());
+
+                    instance.getQueueManager().getQueue(randomKit, false).add(profile.getPlayer());
+
+                    CC.sendMessage(player, " ");
+                    CC.sendMessage(player, "&b&l" + randomKit.getName() + " &7(Unranked)");
+                    CC.sendMessage(player, "&7» &eYou have been queued into a random kit!");
+                    CC.sendMessage(player, " ");
+
+                    player.closeInventory();
+                }
+        ));
 
         return buttons;
     }

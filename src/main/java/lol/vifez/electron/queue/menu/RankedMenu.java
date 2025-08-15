@@ -30,7 +30,7 @@ public class RankedMenu extends Menu {
 
     @Override
     public String getTitle(Player player) {
-        return "&bRanked Queue";
+        return "&7Select a kit...";
     }
 
     @Override
