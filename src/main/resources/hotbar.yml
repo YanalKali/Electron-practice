@@ -1,0 +1,44 @@
+HOTBAR:
+  LOBBY:
+    QUEUES:
+      SLOT: 1
+      MATERIAL: IRON_SWORD
+      NAME: "&bQueues &7(Right Click)"
+      ENABLED: false
+
+    UNRANKED:
+      SLOT: 1
+      MATERIAL: IRON_SWORD
+      NAME: "&bUnranked Queue &7(Right Click)"
+      ENABLED: true
+
+    RANKED:
+      SLOT: 2
+      MATERIAL: DIAMOND_SWORD
+      NAME: "&bRanked Queue &7(Right Click)"
+      ENABLED: true
+
+    LEADERBOARDS:
+      SLOT: 4
+      MATERIAL: EMERALD
+      NAME: "&bLeaderboards &7(Right Click)"
+      ENABLED: true
+
+    KIT-EDITOR:
+      SLOT: 8
+      MATERIAL: BOOK
+      NAME: "&bKit Editor &7(Right Click)"
+      ENABLED: true
+
+    SETTINGS:
+      SLOT: 9
+      MATERIAL: REDSTONE_COMPARATOR
+      NAME: "&bSettings &7(Right Click)"
+      ENABLED: true
+
+  IN-QUEUE:
+    LEAVE_QUEUE:
+      SLOT: 9
+      MATERIAL: REDSTONE
+      NAME: "&cLeave queue &7(Right Click)"
+      ENABLED: true

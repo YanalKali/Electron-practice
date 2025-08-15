@@ -1,67 +1,68 @@
 package lol.vifez.electron.hotbar;
 
+import lol.vifez.electron.Practice;
+import lol.vifez.electron.util.ConfigFile;
 import lol.vifez.electron.util.ItemBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-/*
- * Copyright (c) 2025 Vifez. All rights reserved.
- * Unauthorized use or distribution is prohibited.
- */
-
 @RequiredArgsConstructor
 @Getter
 public enum Hotbar {
-    QUEUES(new ItemBuilder(Material.IRON_SWORD)
-            .name("&bQueues")
-            .lore("&r",
-                    "&7Compete in different modes against",
-                    "&7Multiple people to practice your skills!",
-                    "&r",
-                    "&aRight click to open the menu!")
-            .build()),
+    QUEUES("HOTBAR.LOBBY.QUEUES"),
+    UNRANKED("HOTBAR.LOBBY.UNRANKED"),
+    RANKED("HOTBAR.LOBBY.RANKED"),
+    LEADERBOARDS("HOTBAR.LOBBY.LEADERBOARDS"),
+    KIT_EDITOR("HOTBAR.LOBBY.KIT-EDITOR"),
+    SETTINGS("HOTBAR.LOBBY.SETTINGS"),
+    LEAVE_QUEUE("HOTBAR.IN-QUEUE.LEAVE_QUEUE");
 
-    UNRANKED(new ItemBuilder(Material.IRON_SWORD)
-            .name("&bUnranked Queue &7(Right Click)")
-            .build()),
+    private final String path;
+    private ItemStack item;
 
-    RANKED(new ItemBuilder(Material.DIAMOND_SWORD)
-            .name("&bRanked Queue &7(Right Click)")
-            .build()),
+    public void load() {
+        if (path == null) return;
+        ConfigFile hotbarFile = new ConfigFile(Practice.getInstance(), "hotbar.yml");
 
-    LEADERBOARDS(new ItemBuilder(Material.EMERALD)
-            .name("&bLeaderboards &7(Right Click)")
-            .build()),
+        Material mat = Material.valueOf(hotbarFile.getString(path + ".MATERIAL"));
+        String name = hotbarFile.getString(path + ".NAME");
+        boolean enabled = hotbarFile.getBoolean(path + ".ENABLED");
 
-    KIT_EDITOR(new ItemBuilder(Material.BOOK)
-            .name("&bKit Editor &7(Right Click)")
-            .build()),
+        this.item = enabled ? new ItemBuilder(mat).name(name).build() : null;
+    }
 
-    SETTINGS(new ItemBuilder(Material.REDSTONE_COMPARATOR)
-            .name("&bSettings &7(Right Click)")
-            .build()),
-
-    LEAVE_QUEUE(new ItemBuilder(Material.REDSTONE)
-            .name("&cLeave Queue &7(Right Click)")
-            .build());
-
-
-    private final ItemStack item;
+    public static void loadAll() {
+        for (Hotbar hotbar : values()) hotbar.load();
+    }
 
     public static ItemStack[] getSpawnItems() {
-        return new ItemStack[]{Hotbar.UNRANKED.getItem(),
-                Hotbar.RANKED.getItem(),
-                null,
-                null,
-                Hotbar.LEADERBOARDS.getItem(),
-                null,
-                null,
-                // + 4 slots
-                Hotbar.KIT_EDITOR.getItem(),
-                Hotbar.SETTINGS.getItem()
-        };
+        ConfigFile hotbarFile = new ConfigFile(Practice.getInstance(), "hotbar.yml");
+        ItemStack[] items = new ItemStack[9];
 
+        for (Hotbar hotbar : values()) {
+            if (hotbar.item == null || !hotbar.path.contains("LOBBY")) continue;
+
+            int slot = hotbarFile.getInt(hotbar.path + ".SLOT") - 1;
+            if (slot < 0 || slot >= 9) continue;
+            items[slot] = hotbar.item;
+        }
+        return items;
     }
+
+    public static ItemStack[] getQueueItems() {
+        ConfigFile hotbarFile = new ConfigFile(Practice.getInstance(), "hotbar.yml");
+        ItemStack[] items = new ItemStack[9];
+
+        for (Hotbar hotbar : values()) {
+            if (hotbar.item == null || !hotbar.path.contains("IN-QUEUE")) continue;
+
+            int slot = hotbarFile.getInt(hotbar.path + ".SLOT") - 1;
+            if (slot < 0 || slot >= 9) continue;
+            items[slot] = hotbar.item;
+        }
+        return items;
+    }
+
 }

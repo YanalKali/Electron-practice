@@ -10,7 +10,6 @@ import lol.vifez.electron.hotbar.Hotbar;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,12 +116,13 @@ public class Queue {
 
     public void add(Player player) {
         instance.getQueueManager().getPlayersQueue().put(player.getUniqueId(), this);
-        instance.getProfileManager().getProfile(player.getUniqueId()).setCurrentQueue(ranked ? "ranked_" + this.getKit().getName() : this.getKit().getName());
+        instance.getProfileManager().getProfile(player.getUniqueId())
+                .setCurrentQueue(ranked ? "ranked_" + this.getKit().getName() : this.getKit().getName());
 
         playerJoinTimes.put(player.getUniqueId(), System.currentTimeMillis());
 
         player.getInventory().setArmorContents(null);
-        player.getInventory().setContents(new ItemStack[] {Hotbar.LEAVE_QUEUE.getItem()});
+        player.getInventory().setContents(Hotbar.getQueueItems());
     }
 
     public void remove(Player player) {

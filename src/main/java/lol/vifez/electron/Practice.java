@@ -14,6 +14,8 @@ import lol.vifez.electron.chat.MessageCommand;
 import lol.vifez.electron.chat.ReplyCommand;
 import lol.vifez.electron.commands.admin.*;
 import lol.vifez.electron.commands.staff.MoreCommand;
+import lol.vifez.electron.hotbar.Hotbar;
+import lol.vifez.electron.hotbar.HotbarListener;
 import lol.vifez.electron.kit.KitManager;
 import lol.vifez.electron.kit.commands.KitCommands;
 import lol.vifez.electron.kit.commands.KitEditorCommand;
@@ -93,6 +95,7 @@ public final class Practice extends JavaPlugin {
         }
 
         sendTitle();
+        Hotbar.loadAll();
         initConfig();
         initLibraries();
         initModels();
@@ -107,6 +110,7 @@ public final class Practice extends JavaPlugin {
         new SpawnListener();
         new MatchListener();
         new QueueListener();
+        new HotbarListener();
         new MenuAPI(this);
     }
 
