@@ -6,13 +6,9 @@ import lol.vifez.electron.Practice;
 import lol.vifez.electron.kit.Kit;
 import lol.vifez.electron.profile.Profile;
 import lol.vifez.electron.util.CC;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-/*
- * Copyright (c) 2025 Vifez. All rights reserved.
- * Unauthorized use or distribution is prohibited.
- */
 
 @CommandAlias("elo")
 @CommandPermission("electron.admin")
@@ -28,50 +24,61 @@ public class EloCommand extends BaseCommand {
     }
 
     @Subcommand("set")
-    public void set(CommandSender sender, @Name("player")Player player, @Name("kit") String kitName, @Name("elo")int elo) {
+    public void set(CommandSender sender, @Name("player") String playerName, @Name("kit") String kitName, @Name("elo") int elo) {
+        Player player = Bukkit.getPlayerExact(playerName);
+        if (player == null) {
+            CC.sendMessage(sender, "&cPlayer not found.");
+            return;
+        }
+
         Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
         Kit kit = Practice.getInstance().getKitManager().getKit(kitName.toLowerCase());
-
         if (kit == null) {
             CC.sendMessage(sender, "&cInvalid kit name.");
             return;
         }
 
-        profile.setElo(kit, elo < 0 ? 0 : elo);
-        CC.sendMessage(sender, "&aYou have set &e" + player.getName() + "'s &aelo to " + (elo < 0 ? 0 : elo) + " for &e" + kit.getColor() + kit.getName());
+        profile.setElo(kit, Math.max(0, elo));
+        CC.sendMessage(sender, "&aYou have set &e" + player.getName() + "'s &aelo to " + Math.max(0, elo) + " for &e" + kit.getColor() + kit.getName());
     }
 
     @Subcommand("add")
-    public void add(CommandSender sender, @Name("player")Player player, @Name("kit") String kitName, @Name("elo")int elo) {
+    public void add(CommandSender sender, @Name("player") String playerName, @Name("kit") String kitName, @Name("elo") int elo) {
+        Player player = Bukkit.getPlayerExact(playerName);
+        if (player == null) {
+            CC.sendMessage(sender, "&cPlayer not found.");
+            return;
+        }
+
         Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
         Kit kit = Practice.getInstance().getKitManager().getKit(kitName.toLowerCase());
-
         if (kit == null) {
             CC.sendMessage(sender, "&cInvalid kit name.");
             return;
         }
 
-        int i = profile.getElo(kit) + elo;
-        if (i < 0) i = 0;
-
+        int i = Math.max(0, profile.getElo(kit) + elo);
         profile.setElo(kit, i);
-        CC.sendMessage(sender, "&aYou have added to &e" + player.getName() + "'s &aelo balance " + (elo < 0 ? 0 : elo) + " elo for &e" + kit.getColor() + kit.getName());
+        CC.sendMessage(sender, "&aYou have added " + elo + " elo to &e" + player.getName() + " &afor &e" + kit.getColor() + kit.getName());
     }
 
     @Subcommand("remove")
-    public void remove(CommandSender sender, @Name("player")Player player, @Name("kit") String kitName, @Name("elo")int elo) {
+    public void remove(CommandSender sender, @Name("player") String playerName, @Name("kit") String kitName, @Name("elo") int elo) {
+        Player player = Bukkit.getPlayerExact(playerName);
+        if (player == null) {
+            CC.sendMessage(sender, "&cPlayer not found.");
+            return;
+        }
+
         Profile profile = Practice.getInstance().getProfileManager().getProfile(player.getUniqueId());
         Kit kit = Practice.getInstance().getKitManager().getKit(kitName.toLowerCase());
-
         if (kit == null) {
             CC.sendMessage(sender, "&cInvalid kit name.");
             return;
         }
 
-        int i = profile.getElo(kit) - elo;
-        if (i < 0) i = 0;
-
+        int i = Math.max(0, profile.getElo(kit) - elo);
         profile.setElo(kit, i);
-        CC.sendMessage(sender, "&aYou have removed from &e" + player.getName() + "'s &aelo balance " + (elo < 0 ? 0 : elo) + " elo for &e" + kit.getColor() + kit.getName());
+        CC.sendMessage(sender, "&aYou have removed " + elo + " elo from &e" + player.getName() + " &afor &e" + kit.getColor() + kit.getName());
     }
 }
