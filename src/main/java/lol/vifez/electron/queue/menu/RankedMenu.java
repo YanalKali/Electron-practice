@@ -90,8 +90,9 @@ public class RankedMenu extends Menu {
                     instance.getQueueManager().getQueue(randomKit, true).add(profile.getPlayer());
 
                     CC.sendMessage(player, " ");
-                    CC.sendMessage(player, "&c&l" + randomKit.getName() + " &7(Ranked)");
-                    CC.sendMessage(player, "&7» &eYou have been queued into a random ranked kit!");
+                    CC.sendMessage(player, "&e&lRandom Queue &c[R]");
+                    CC.sendMessage(player, "&e▪ &7Kit: &e" + randomKit.getName());
+                    CC.sendMessage(player, "&e▪ &7Searching for a &eplayer...");
                     CC.sendMessage(player, " ");
 
                     player.closeInventory();
@@ -120,11 +121,11 @@ class RankedKitButton extends EasyButton {
 
                     instance.getQueueManager().getQueue(kit, true).add(profile.getPlayer());
 
-                    player.sendMessage(" ");
-                    player.sendMessage(CC.translate("&c&lRanked queue"));
-                    player.sendMessage(CC.translate("&c▪ &7Kit: &c" + kit.getName()));
-                    player.sendMessage(CC.translate("  &7Searching for player..."));
-                    player.sendMessage(" ");
+                    CC.sendMessage(player, " ");
+                    CC.sendMessage(player, "&c&lRanked queue");
+                    CC.sendMessage(player, "&c▪ &7Kit: &c" + kit.getName());
+                    CC.sendMessage(player, "&c▪ &7Searching for a &cplayer...");
+                    CC.sendMessage(player, " ");
 
                     player.closeInventory();
                 });

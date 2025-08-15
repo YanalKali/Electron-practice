@@ -81,10 +81,10 @@ public class UnrankedMenu extends Menu {
                     instance.getQueueManager().getQueue(randomKit, false).add(profile.getPlayer());
 
                     CC.sendMessage(player, " ");
-                    CC.sendMessage(player, "&b&l" + randomKit.getName() + " &7(Unranked)");
-                    CC.sendMessage(player, "&7» &eYou have been queued into a random kit!");
+                    CC.sendMessage(player, "&e&lRandom Queue &7[UR]");
+                    CC.sendMessage(player, "&e▪ &7Kit: &e" + randomKit.getName());
+                    CC.sendMessage(player, "&e▪ &7Searching for a &eplayer...");
                     CC.sendMessage(player, " ");
-
                     player.closeInventory();
                 }
         ));
@@ -110,8 +110,9 @@ class KitButton extends EasyButton {
             instance.getQueueManager().getQueue(kit, false).add(profile.getPlayer());
 
             CC.sendMessage(player, " ");
-            CC.sendMessage(player, "&b&l" + kit.getName() + " &7(Unranked)");
-            CC.sendMessage(player, "&7» &ePlease wait for the game to start...");
+            CC.sendMessage(player, "&b&lUnranked Queue");
+            CC.sendMessage(player, "&b▪ &7Kit: &b" + kit.getName());
+            CC.sendMessage(player, "&b▪ &7Searching for a &bplayer...");
             CC.sendMessage(player, " ");
 
             player.closeInventory();
