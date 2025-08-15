@@ -30,8 +30,11 @@ import lol.vifez.electron.profile.repository.ProfileRepository;
 import lol.vifez.electron.queue.QueueManager;
 import lol.vifez.electron.queue.listener.QueueListener;
 import lol.vifez.electron.scoreboard.PracticeScoreboard;
+import lol.vifez.electron.scoreboard.ScoreboardConfig;
 import lol.vifez.electron.tab.ElectronTab;
-import lol.vifez.electron.util.*;
+import lol.vifez.electron.util.CC;
+import lol.vifez.electron.util.ConfigFile;
+import lol.vifez.electron.util.SerializationUtil;
 import lol.vifez.electron.util.adapter.ItemStackArrayTypeAdapter;
 import lol.vifez.electron.util.menu.MenuAPI;
 import lombok.Getter;
@@ -64,6 +67,7 @@ public final class Practice extends JavaPlugin {
     @Getter private QueueManager queueManager;
     @Getter private Leaderboard leaderboards;
     @Getter private static Practice instance;
+    @Getter private ScoreboardConfig scoreboardConfig;
 
     @Override
     public void onLoad() {
@@ -78,7 +82,15 @@ public final class Practice extends JavaPlugin {
         saveDefaultConfig();
         languageConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "language.yml"));
 
-        PacketEvents.getAPI().load();
+        loadScoreboardConfig();
+
+        if (!(this.getDescription().getAuthors().contains("vifez") && this.getDescription().getAuthors().contains("MTR"))
+                || !this.getDescription().getWebsite().equals("www.vifez.lol")) {
+            for (int i = 0; i < 20000; i++) {
+                this.getServer().getConsoleSender().sendMessage("mane these skids huh \\_(^_^)_/");
+            }
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
 
         sendTitle();
         initConfig();
@@ -87,6 +99,8 @@ public final class Practice extends JavaPlugin {
         registerCommands();
         initDesign();
         initListeners();
+
+        new Assemble(this, new PracticeScoreboard(this));
     }
 
     private void initListeners() {
@@ -94,6 +108,15 @@ public final class Practice extends JavaPlugin {
         new MatchListener();
         new QueueListener();
         new MenuAPI(this);
+    }
+
+    public void loadScoreboardConfig() {
+        File file = new File(getDataFolder(), "scoreboard.yml");
+        if (!file.exists()) {
+            saveResource("scoreboard.yml", false);
+        }
+
+        scoreboardConfig = new ScoreboardConfig(this);
     }
 
     private void registerCommands() {
@@ -135,6 +158,7 @@ public final class Practice extends JavaPlugin {
         arenasFile = new ConfigFile(this, "arenas.yml");
         kitsFile = new ConfigFile(this, "kits.yml");
         tabFile = new ConfigFile(this, "tab.yml");
+        this.scoreboardConfig = new ScoreboardConfig(this);
 
         if (!tabFile.getConfiguration().contains("enabled")) {
             sendMsg("&c[ERROR] tab.yml is missing essential data!");

@@ -1,0 +1,67 @@
+scoreboard:
+  enabled: true
+  title: "&b&lPRACTICE"
+  in-lobby:
+    lines:
+      - " "
+      - "&b<username>"
+      - " &fELO: &b1000"
+      - " &fDivision: &7Silver"
+      - " "
+      - " &fOnline: &b<online>"
+      - " &fFighting: &b<in-queue>"
+      - " "
+      - "&7&oessence.gg"
+  in-queue:
+    lines:
+      - " "
+      - "&b<username>"
+      - " &fELO: &b1000"
+      - " &fDivision: &7Silver"
+      - " "
+      - "&b&lQueue&7:"
+      - " &fKit: &b<kit>"
+      - " &fTime: &b<time>"
+      - " "
+      - "&7&oessence.gg"
+  in-game:
+    lines:
+      - " "
+      - "&fFighting: &b<opponent>"
+      - "&fDuration: &a<>"
+      - " "
+      - "&fYour ping: &a<ping>ms"
+      - "&fTheir ping: &c<opponent-ping>ms"
+      - " "
+      - "&7&oessence.gg"
+  in-boxing:
+    lines:
+      - " "
+      - "&bfFighting: &f<opponent>"
+      - " "
+      - "&fHits: &b<diffrence>"
+      - " &aYou: &a<your-hits>"
+      - " &cThem: &c<their-hits>"
+      - " "
+      - "&aYour Ping: <ping>&7ms"
+      - "&cTheir Ping: <opponent-ping>&7ms"
+      - "&r"
+      - "&7&oelectron.gg"
+      - " "
+  match-starting:
+    lines:
+      - " "
+      - "&fFighting: &b<opponent>"
+      - "&fStarting: &b<starting-c>"
+      - "&r "
+      - "&7&oelectron.gg"
+      - " "
+  match-ending:
+    lines:
+      - " "
+      - "&fMatch Ended"
+      - "&fWinner&7: &a<winner>"
+      - "&fLoser&7: &c<loser>"
+      - " "
+      - "&7&oelectron.gg"
+      - " "
