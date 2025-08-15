@@ -22,52 +22,43 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/*
+ * Copyright (c) 2025 Vifez. All rights reserved.
+ * Unauthorized use or distribution is prohibited.
+ */
+
 @RequiredArgsConstructor
 @Getter
+@Setter
 public class Profile {
 
     @SerializedName("_id")
     private final UUID uuid;
 
-    @Setter
     private Player lastMessagedPlayer;
 
+    @Getter
     private transient DuelRequest duelRequest;
 
-    private String name = "";
-    private String currentQueue = "";
+    private String name = "", currentQueue = "";
 
     private Divisions division = Divisions.SILVER_I;
 
-    private int wins = 0;
-    private int losses = 0;
-    private int winStreak = 0;
-
-    private boolean editMode = false;
-    private boolean buildMode = false;
+    private int wins = 0, losses = 0, winStreak = 0;
+    private boolean editMode = false, buildMode = false;
 
     private final Map<String, ItemStack[]> kitLoadout = new HashMap<>();
     private final Map<String, Integer> kitWins = new HashMap<>();
     private final Map<String, Integer> eloMap = new HashMap<>();
 
     private boolean scoreboardEnabled = true;
-    @Setter
     private boolean privateMessagingEnabled = true;
     private boolean duelRequestsEnabled = true;
-    @Setter
     private String worldTime = "DAY";
 
     public Player getPlayer() {
         Player p = Bukkit.getPlayer(uuid);
         return (p != null && p.isOnline()) ? p : null;
-    }
-
-    public DuelRequest getDuelRequest() {
-        return duelRequest;
-    }
-
-    public void setDuelRequest(DuelRequest duelRequest) {
-        this.duelRequest = duelRequest;
     }
 
     public void setScoreboardEnabled(boolean enabled) {
@@ -151,7 +142,7 @@ public class Profile {
         }
 
         DuelRequest request = new DuelRequest(Practice.getInstance(), this, targetProfile, kit, System.currentTimeMillis());
-        setDuelRequest(request);
+        this.duelRequest = request;
         targetProfile.setDuelRequest(request);
 
         CC.sendMessage(sender, CC.translate("\n&c&lDuel sent\n&7* Opponent: &c" + target.getName() + "\n&7* Kit: &c" + kit.getName() + "\n "));
