@@ -14,6 +14,7 @@ import lol.vifez.electron.chat.MessageCommand;
 import lol.vifez.electron.chat.ReplyCommand;
 import lol.vifez.electron.commands.admin.*;
 import lol.vifez.electron.commands.staff.MoreCommand;
+import lol.vifez.electron.duel.command.DuelCommand;
 import lol.vifez.electron.hotbar.Hotbar;
 import lol.vifez.electron.hotbar.HotbarListener;
 import lol.vifez.electron.kit.KitManager;
@@ -136,6 +137,7 @@ public final class Practice extends JavaPlugin {
         manager.registerCommand(new ReplyCommand());
         manager.registerCommand(new MoreCommand());
         manager.registerCommand(new EloCommand());
+        manager.registerCommand(new DuelCommand());
     }
 
     private void sendTitle() {

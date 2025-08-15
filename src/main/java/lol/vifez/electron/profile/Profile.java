@@ -3,14 +3,17 @@ package lol.vifez.electron.profile;
 import com.google.gson.annotations.SerializedName;
 import com.mongodb.client.model.Filters;
 import lol.vifez.electron.Practice;
+import lol.vifez.electron.duel.DuelRequest;
 import lol.vifez.electron.kit.Kit;
 import lol.vifez.electron.divisions.Divisions;
 import lol.vifez.electron.match.Match;
 import lol.vifez.electron.queue.Queue;
 import lol.vifez.electron.util.CC;
+import lol.vifez.electron.util.MessageBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,48 +22,52 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/*
- * Copyright (c) 2025 Vifez. All rights reserved.
- * Unauthorized use or distribution is prohibited.
- */
-
 @RequiredArgsConstructor
-@Getter @Setter
+@Getter
 public class Profile {
 
     @SerializedName("_id")
     private final UUID uuid;
 
+    @Setter
     private Player lastMessagedPlayer;
 
-    private String name, currentQueue = "";
+    private transient DuelRequest duelRequest;
+
+    private String name = "";
+    private String currentQueue = "";
+
     private Divisions division = Divisions.SILVER_I;
 
-    private int wins = 0, losses = 0, winStreak = 0;
-    private boolean editMode = false, buildMode = false;
+    private int wins = 0;
+    private int losses = 0;
+    private int winStreak = 0;
 
-    private Map<String, ItemStack[]> kitLoadout = new HashMap<>();
-    private Map<String, Integer> kitWins = new HashMap<>();
-    private Map<String, Integer> eloMap = new HashMap<>();
+    private boolean editMode = false;
+    private boolean buildMode = false;
+
+    private final Map<String, ItemStack[]> kitLoadout = new HashMap<>();
+    private final Map<String, Integer> kitWins = new HashMap<>();
+    private final Map<String, Integer> eloMap = new HashMap<>();
 
     private boolean scoreboardEnabled = true;
+    @Setter
     private boolean privateMessagingEnabled = true;
+    private boolean duelRequestsEnabled = true;
+    @Setter
     private String worldTime = "DAY";
 
     public Player getPlayer() {
-        return Bukkit.getPlayer(uuid) != null && Bukkit.getPlayer(uuid).isOnline() ? Bukkit.getPlayer(uuid) : null;
+        Player p = Bukkit.getPlayer(uuid);
+        return (p != null && p.isOnline()) ? p : null;
     }
 
-    public Player getLastMessagedPlayer() {
-        return lastMessagedPlayer;
+    public DuelRequest getDuelRequest() {
+        return duelRequest;
     }
 
-    public void setLastMessagedPlayer(Player player) {
-        this.lastMessagedPlayer = player;
-    }
-
-    public boolean isScoreboardEnabled() {
-        return scoreboardEnabled;
+    public void setDuelRequest(DuelRequest duelRequest) {
+        this.duelRequest = duelRequest;
     }
 
     public void setScoreboardEnabled(boolean enabled) {
@@ -68,43 +75,22 @@ public class Profile {
         saveToMongoDB();
     }
 
-    public String getWorldTime() {
-        return worldTime;
-    }
-
-    public void setWorldTime(String worldTime) {
-        this.worldTime = worldTime;
-    }
-
-    public boolean isPrivateMessagingEnabled() {
-        return privateMessagingEnabled;
-    }
-
-    public void setPrivateMessagingEnabled(boolean privateMessagingEnabled) {
-        this.privateMessagingEnabled = privateMessagingEnabled;
-    }
-
     private void saveToMongoDB() {
-        ProfileManager profileManager = Practice.getInstance().getProfileManager();
-        profileManager.getProfileRepository().getCollection()
+        Practice.getInstance().getProfileManager().getProfileRepository().getCollection()
                 .updateOne(Filters.eq("_id", uuid.toString()),
                         new org.bson.Document("$set", new org.bson.Document("scoreboardEnabled", scoreboardEnabled)));
     }
 
     public int getPing() {
         Player player = getPlayer();
-
         if (player != null) {
             try {
                 Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-
                 return (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
             } catch (Exception e) {
                 e.printStackTrace();
-                return -1;
             }
         }
-
         return -1;
     }
 
@@ -130,18 +116,52 @@ public class Profile {
 
     public void checkDivision(Kit kit) {
         int elo = getElo(kit);
-        Divisions playerDivision = getDivision();
+        Divisions playerDivision = division;
 
-        for (Divisions division : Divisions.values()) {
-            if (elo >= division.getMinimumElo()) {
-                playerDivision = division;
+        for (Divisions d : Divisions.values()) {
+            if (elo >= d.getMinimumElo()) {
+                playerDivision = d;
             } else break;
         }
 
-        if (this.division != playerDivision) {
-            this.division = playerDivision;
-
+        if (division != playerDivision) {
+            division = playerDivision;
             CC.sendMessage(getPlayer(), "&aYou are now in " + playerDivision.getPrettyName() + " &adivision!");
         }
+    }
+
+    public void sendDuelRequest(Player target, Kit kit) {
+        Player sender = getPlayer();
+        Profile targetProfile = Practice.getInstance().getProfileManager().getProfile(target.getUniqueId());
+
+        if (!duelRequestsEnabled) {
+            CC.sendMessage(sender, "&cYou cannot send a duel request while you are not allowing duel requests!");
+            return;
+        }
+
+        if (!targetProfile.isDuelRequestsEnabled()) {
+            CC.sendMessage(sender, "&c" + target.getName() + " is not allowing duel requests!");
+            return;
+        }
+
+        if (duelRequest != null && !duelRequest.isExpired()) {
+            long seconds = (System.currentTimeMillis() - duelRequest.getRequestedAt()) / 1000;
+            CC.sendMessage(sender, "&cYou have already sent a duel request to " + target.getName() + ". Please wait " + seconds + "s.");
+            return;
+        }
+
+        DuelRequest request = new DuelRequest(Practice.getInstance(), this, targetProfile, kit, System.currentTimeMillis());
+        setDuelRequest(request);
+        targetProfile.setDuelRequest(request);
+
+        CC.sendMessage(sender, CC.translate("\n&c&lDuel sent\n&7* Opponent: &c" + target.getName() + "\n&7* Kit: &c" + kit.getName() + "\n "));
+
+        new MessageBuilder(CC.translate(
+                "\n&c&lDuel Request\n&7* Opponent: &c" + name + "\n&7* Kit: &c" + kit.getName() + "\n&a&lCLICK TO ACCEPT\n"))
+                .hover(true)
+                .clickable(true)
+                .hoverText("&eClick to accept")
+                .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/duel accept " + name))
+                .sendMessage(target);
     }
 }
